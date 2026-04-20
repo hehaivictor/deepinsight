@@ -1224,7 +1224,7 @@
       "title": "精简设置中心账号信息展示与关闭按钮结构",
       "changes": [
         "style: 调整设置侧栏标签与操作按钮在明暗主题下的视觉样式",
-        "docs: 新增 DeepInsight 深瞳产品介绍文档"
+        "docs: 新增 DeepInsight 深察产品介绍文档"
       ]
     },
     {

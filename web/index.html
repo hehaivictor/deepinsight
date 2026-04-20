@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="shortcut icon" href="favicon.svg">
-    <title>DeepInsight 深瞳</title>
+    <title>DeepInsight 深察</title>
     <!-- 本地化资源 - 支持内网部署 -->
     <script>
         // 主题预加载：避免刷新时闪烁
@@ -723,7 +723,7 @@
                     <div class="flex flex-col">
                         <h1 class="text-xl leading-tight">
                             <span class="brand-title">DeepInsight</span>
-                            <span class="brand-title-cn ml-1.5">深瞳</span>
+                            <span class="brand-title-cn ml-1.5">深察</span>
                         </h1>
                         <p class="text-xs text-muted tracking-wide">洞察深处，方见真章</p>
                     </div>
@@ -752,14 +752,6 @@
                             class="px-3 md:px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium">
                         <span class="hidden sm:inline">报告</span>
                         <span class="sm:hidden">报告</span>
-                    </button>
-                    <button x-show="canViewAdminCenter()"
-                            x-cloak
-                            @click="openAdminCenter('overview')"
-                            :class="getHeaderNavClass(isAdminViewActive())"
-                            class="px-3 md:px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium">
-                        <span class="hidden sm:inline">管理员中心</span>
-                        <span class="sm:hidden">后台</span>
                     </button>
                     <button @click="window.location.href='help.html'"
                             :class="getHeaderNavClass(false)"
@@ -6221,7 +6213,7 @@
         <!-- Footer -->
         <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
             <div class="max-w-7xl mx-auto px-4 text-center text-xs sm:text-sm text-muted">
-                <span>© DeepInsight 深瞳</span>
+                <span>© DeepInsight 深察</span>
                 <span class="mx-2">|</span>
                 <span x-text="`v${appVersion}`"></span>
                 <span class="mx-2">|</span>

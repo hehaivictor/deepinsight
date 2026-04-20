@@ -20520,7 +20520,7 @@ xychart-beta
 - 客观公正，既要指出优势也要指出不足
 - 报告要专业、结构清晰、有理有据
 - 使用 Markdown 格式
-- 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*
+- 报告末尾使用署名：*此报告由 DeepInsight 深察生成*
 
 请生成完整的评估报告："""
 
@@ -20678,7 +20678,7 @@ def build_compact_report_prompt(session: dict, evidence_pack: Optional[dict] = N
 3. 结论优先引用 Q 编号；信息不足时明确写“暂无数据”或“待补充”。
 4. component 为 `table` 时输出 Markdown 表格；为 `list` 时输出列表；为 `mermaid` 时输出 ```mermaid 代码块。
 5. 内容要紧凑、结论先行，避免大段空话和重复表述。
-6. 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*{schema_issue_notice}
+6. 报告末尾使用署名：*此报告由 DeepInsight 深察生成*{schema_issue_notice}
 
 请直接生成完整报告："""
 
@@ -20712,7 +20712,7 @@ def build_compact_report_prompt(session: dict, evidence_pack: Optional[dict] = N
 4. 可视化分析可包含 Mermaid，但仅保留 1-2 个最有价值的图，不要堆砌。
 5. 所有关键结论尽量引用 Q 编号；信息不足时明确写“暂无数据”。
 6. 内容要紧凑、结论先行，避免大段空话和重复表述。
-7. 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*
+7. 报告末尾使用署名：*此报告由 DeepInsight 深察生成*
 
 请直接生成完整报告："""
 
@@ -20827,7 +20827,7 @@ def build_report_prompt_with_options(session: dict, evidence_pack: Optional[dict
 3. 关键结论优先引用问答证据（Q数字），不得编造访谈事实。
 4. 若某章节信息不足，明确写出“暂无数据”或“待补充”，不得空章节。
 5. flowchart 连接线标签必须使用 `A -->|标签| B` 语法。
-6. 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*{schema_issue_notice}
+6. 报告末尾使用署名：*此报告由 DeepInsight 深察生成*{schema_issue_notice}
 
 请生成完整的报告："""
     else:
@@ -20998,7 +20998,7 @@ flowchart TD
 - 报告要专业、结构清晰、可操作
 - **Mermaid 语法要求严格，请仔细检查每个图表的语法正确性**
 - **flowchart 连接线带标签语法必须是 `A -->|标签| B`，禁止使用 `A --|标签|--> B`**
-- 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*
+- 报告末尾使用署名：*此报告由 DeepInsight 深察生成*
 
 请生成完整的报告："""
 
@@ -25300,7 +25300,7 @@ def render_report_from_draft_custom_v1(session: dict, draft: dict, quality_meta:
         lines.append("")
 
     lines.extend([
-        "*此报告由 DeepInsight 深瞳生成*",
+        "*此报告由 DeepInsight 深察生成*",
         "",
     ])
     return "\n".join(lines)
@@ -25465,7 +25465,7 @@ def render_report_from_draft_assessment_v1(session: dict, draft: dict, quality_m
         "",
         *open_questions_table,
         "",
-        "*此报告由 DeepInsight 深瞳生成*",
+        "*此报告由 DeepInsight 深察生成*",
         "",
     ]
     return "\n".join(lines)
@@ -25781,7 +25781,7 @@ def render_report_from_draft_v3(session: dict, draft: dict, quality_meta: dict) 
         "",
         *open_questions_table,
         "",
-        "*此报告由 DeepInsight 深瞳生成*",
+        "*此报告由 DeepInsight 深察生成*",
         "",
     ]
 
@@ -31963,7 +31963,7 @@ def generate_simple_report(session: dict) -> str:
     content += generate_interview_appendix(session)
 
     content += """
-*此报告由 DeepInsight 深瞳生成*
+*此报告由 DeepInsight 深察生成*
 """
 
     return content
@@ -33264,7 +33264,7 @@ def simplify_solution_subject(value: object, max_len: int = 0) -> str:
     if not text:
         return ""
 
-    text = text.replace("DeepInsight", "").replace("深瞳", "").strip()
+    text = text.replace("DeepInsight", "").replace("深察", "").strip()
     original = text
     patterns = [
         r"(产品)?需求调研报告$",
