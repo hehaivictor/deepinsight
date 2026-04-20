@@ -1,0 +1,169 @@
+{
+  "name": "license-admin",
+  "description": "License 生成、延期、撤销与运行时开关变更，先读状态和专项回归，再人工执行批量写操作。",
+  "risk_level": "high",
+  "doctor_profile": "auto",
+  "guardrails_suite": "extended",
+  "smoke_suite": "minimal",
+  "strict_doctor": false,
+  "docs": [
+    "docs/agent/admin-ops.md"
+  ],
+  "contract": "license-admin",
+  "mission": {
+    "summary": "把 License 管理动作的一句话诉求先收口成“要改哪批 License、为什么可以改、证据和回滚如何留存”的治理使命，再进入批量动作。",
+    "desired_outcomes": [
+      "先明确是查询、批量生成、延期、撤销还是 enforcement 变更，不把多个动作混成一次执行",
+      "先确认活跃批次、管理员会话和 bootstrap 条件，再讨论真实写操作",
+      "先保留目标范围、latest artifact 和治理字段，再进入批量动作"
+    ],
+    "acceptance_criteria": [
+      "管理员 License 路由仍要求有效 License，不会被普通管理员会话绕过",
+      "批量动作前有明确目标范围、治理字段和最新 artifact 证据",
+      "运行时 enforcement 变更不会破坏查询、详情和批量接口的一致性"
+    ],
+    "non_goals": [
+      "不要在 mission 阶段直接决定真实生产账号范围或批量数量",
+      "不要绕开现有 License 管理脚本和专项回归，直接在 Web 层做一次性操作"
+    ],
+    "risks": [
+      "License 管理同时受管理员白名单、有效 License 和 enforcement 状态影响，容易因前置条件不足误判",
+      "批量生成、延期、撤销和 bootstrap 共用一组高风险接口，缺证据时必须先阻断"
+    ],
+    "evidence_expectations": [
+      "artifacts/harness-runs/latest.json",
+      "artifacts/harness-runs/latest-handoff.json",
+      "scripts/license_manager.py --json enforcement-status",
+      "tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_license_management_endpoints_cover_summary_detail_search_and_bulk_actions"
+    ]
+  },
+  "planner": {
+    "summary": "先把 License 管理动作拆成只读确认、专项回归和高风险写操作三个层次，再决定是否进入正式执行。",
+    "scope_focus": [
+      "先确认 enforcement、活跃批次、管理员白名单与 bootstrap 条件",
+      "把批量生成、延期、撤销和运行时开关变更拆成独立动作，避免一份计划混在一起",
+      "先明确受影响账号范围和回滚条件，再讨论正式写操作"
+    ],
+    "acceptance_focus": [
+      "管理员 License 路由仍要求有效 License，不被普通管理员会话绕过",
+      "批量动作前有明确的目标范围、治理字段和最新 artifact 证据",
+      "运行时 enforcement 变更不会破坏当前环境的查询、详情和批量接口一致性"
+    ],
+    "non_goals": [
+      "不要在 Planner 阶段直接决定真实批量写入数量或生产账号范围",
+      "不要绕开现有 License 管理脚本和专项回归，直接在 Web 层做一次性操作"
+    ],
+    "risks": [
+      "License 管理同时受管理员白名单、有效 License 和运行时 enforcement 影响，容易因前置条件不足误判",
+      "批量生成、延期、撤销与 bootstrap 场景共享同一组高风险接口，需要单独记录治理字段和回滚入口"
+    ]
+  },
+  "playbook": {
+    "output": "docs/agent/playbooks/license-admin.md",
+    "title": "License 管理与批量操作核对",
+    "summary": "先确认 enforcement 状态、活跃批次与管理员权限，再决定是否进入批量生成、延期、撤销或运行时开关写入。",
+    "when_to_use": [
+      "需要批量生成、延期、撤销 License，或调整运行时 enforcement 开关",
+      "需要确认当前环境是否还能 bootstrap 首批种子 License",
+      "用户反馈 License 管理后台异常，需要区分是查询层、批量动作还是运行时开关问题"
+    ],
+    "command_blocks": [
+      {
+        "commands": [
+          "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json enforcement-status",
+          "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json list --status active",
+          "python3 scripts/agent_harness.py --task license-admin --profile auto --artifact-dir artifacts/harness-runs",
+          "python3 -m unittest tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_license_routes_require_valid_license_even_when_gate_disabled tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_license_management_endpoints_cover_summary_detail_search_and_bulk_actions tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_generate_license_batch_can_assign_professional_level tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_can_bootstrap_first_seed_license_without_existing_license"
+        ]
+      },
+      {
+        "intro": "确认需要正式执行时，再显式使用：",
+        "commands": [
+          "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json generate --count 5 --duration-days 30",
+          "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json revoke 12 --reason \"manual revoke\"",
+          "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json extend 12 --duration-days 30",
+          "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py enforcement-set --enabled true --sync-default"
+        ]
+      }
+    ],
+    "artifact_files": [
+      "artifacts/harness-runs/latest.json",
+      "对应 run 目录下的 workflow.json",
+      "对应 run 目录下的 guardrails.json"
+    ],
+    "focus_points": [
+      "enforcement 状态、活跃批次和批量动作接口是否仍一致",
+      "管理员 License 路由是否仍要求有效 License，不会被普通管理员直接绕过",
+      "无现有 License 时的 bootstrap 首批种子 License 是否仍可用",
+      "批量生成、延期、撤销后，权限边界和时间窗规则是否保持不变"
+    ],
+    "manual_confirmations": [
+      "批量生成、延期、撤销或替换真实 License",
+      "修改 enforcement 默认值或运行时开关",
+      "对生产风格账号执行高风险 License 写操作"
+    ]
+  },
+  "workflow": {
+    "mode": "preview_first",
+    "governance": {
+      "required_for_apply": true,
+      "fields": [
+        { "name": "change_reason", "label": "变更原因", "required": true },
+        { "name": "operator", "label": "操作者", "required": true },
+        { "name": "approver", "label": "审批人", "required": true },
+        { "name": "ticket", "label": "关联工单", "required": true }
+      ]
+    },
+    "preconditions": [
+      {
+        "id": "admin-session-ready",
+        "title": "确认当前环境已配置管理员白名单",
+        "type": "requires_admin_session",
+        "auth_db": "data/auth/users.db"
+      }
+    ],
+    "steps": [
+      {
+        "id": "inspect",
+        "title": "读取 License 当前状态",
+        "command": "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json enforcement-status"
+      },
+      {
+        "id": "active-licenses",
+        "title": "查看活跃 License 列表",
+        "command": "uv run --with flask --with flask-cors --with anthropic --with requests --with reportlab --with pillow --with jdcloud-sdk --with 'psycopg[binary]' --with boto3 python3 scripts/license_manager.py --json list --status active"
+      },
+      {
+        "id": "verify",
+        "title": "跑 License 管理专项回归",
+        "executor": "unittest",
+        "quiet": true,
+        "cases": [
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_license_routes_require_valid_license_even_when_gate_disabled",
+            "label": "管理员 License 路由仍要求有效 License"
+          },
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_license_management_endpoints_cover_summary_detail_search_and_bulk_actions",
+            "label": "License 管理列表与批量动作"
+          },
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_generate_license_batch_can_assign_professional_level",
+            "label": "批量生成专业版 License"
+          },
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_admin_can_bootstrap_first_seed_license_without_existing_license",
+            "label": "首批种子 License bootstrap"
+          }
+        ]
+      },
+      {
+        "id": "apply",
+        "title": "人工确认后执行 License 写操作",
+        "detail": "只在人工确认后执行 generate / revoke / extend / enforcement-set，执行前先记录 latest artifact 与目标账号范围。",
+        "requires_apply": true,
+        "confirmation_token": "LICENSE_ADMIN_APPLY"
+      }
+    ]
+  }
+}

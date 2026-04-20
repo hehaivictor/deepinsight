@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" href="favicon.svg">
+    <title>Deep Vision 深瞳 - 洞察深处，方见真章</title>
+    <script>
+        (function () {
+            const warn = console.warn;
+            console.warn = function (...args) {
+                if (typeof args[0] === "string" && args[0].includes("cdn.tailwindcss.com should not be used in production")) {
+                    return;
+                }
+                return warn.apply(console, args);
+            };
+        })();
+    </script>
+    <script>
+        (function () {
+            const storageKey = 'deepinsight_theme_mode';
+            const validModes = ['light', 'dark', 'system'];
+            let mode = 'system';
+
+            try {
+                const savedMode = localStorage.getItem(storageKey);
+                if (validModes.includes(savedMode)) {
+                    mode = savedMode;
+                }
+            } catch (error) {
+                mode = 'system';
+            }
+
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const effectiveMode = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
+            const root = document.documentElement;
+            root.setAttribute('data-theme-mode', mode);
+            root.setAttribute('data-theme', effectiveMode);
+            root.style.colorScheme = effectiveMode;
+        })();
+    </script>
+    <script src="vendor/css/tailwind-full.js"></script>
+    <link rel="stylesheet" href="vendor/css/fonts.css">
+    <style>
+        /* 基础样式 */
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100%;
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0a0a0a;
+            color: #fafafa;
+            overflow-x: hidden;
+            height: 100%;
+            margin: 0;
+        }
+
+        /* 品牌字体 */
+        .brand-title {
+            font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+        .brand-title-cn {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-weight: 600;
+        }
+
+        /* ========== Hero 区域 ========== */
+        .hero-section {
+            height: 100vh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            scroll-snap-align: start;
+        }
+
+        /* 背景光效 */
+        .hero-glow {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .hero-glow-1 {
+            background: radial-gradient(circle, #357BE2 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+            animation: float 20s ease-in-out infinite;
+        }
+        .hero-glow-2 {
+            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+            bottom: -300px;
+            right: -200px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* 网格背景 */
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+        }
+
+        /* Hero 文字动画 */
+        .hero-title {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+        }
+        .hero-subtitle {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+        }
+        .hero-tagline {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease-out 0.9s forwards;
+        }
+        .hero-cta {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease-out 1.2s forwards;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Logo 眼睛动画 */
+        .logo-eye {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(53, 123, 226, 0.5));
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(53, 123, 226, 0.8));
+                transform: scale(1.02);
+            }
+        }
+
+        /* 滚动指示器 */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            animation: fadeInUpCentered 1s ease-out 1.5s forwards, bounce 2s ease-in-out 2.5s infinite;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 10;
+        }
+        .scroll-indicator:hover {
+            color: #357BE2;
+        }
+        @keyframes fadeInUpCentered {
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ========== 通用章节样式 ========== */
+        .section {
+            height: 100vh;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(72px, 8vh, 96px) 24px;
+            position: relative;
+            scroll-snap-align: start;
+            overflow-y: auto;
+        }
+        .hero-section > .text-center {
+            width: min(100%, 980px);
+            padding-inline: clamp(18px, 3vw, 32px);
+        }
+        .section > [class*="max-w-"] {
+            width: min(100%, 1120px);
+        }
+        .section h2.reveal {
+            line-height: 1.18;
+            letter-spacing: -0.02em;
+        }
+        .section .text-center.mb-16 {
+            margin-bottom: clamp(2.25rem, 4.8vw, 4rem);
+        }
+        .section .text-center > p.reveal.text-lg,
+        .section .text-center > p.text-lg {
+            max-width: 46rem;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.72;
+        }
+        .section .text-center > p.reveal:not(.text-lg):not(.text-sm),
+        .section .text-center > p:not(.text-lg):not(.text-sm) {
+            max-width: 42rem;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        .hero-subtitle {
+            line-height: 1.45;
+        }
+        .hero-tagline {
+            max-width: 40rem;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.72;
+        }
+
+        /* 滚动动画触发 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+        .reveal-delay-6 { transition-delay: 0.6s; }
+
+        /* ========== 痛点区域 ========== */
+        .pain-section {
+            background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
+        }
+        .pain-quote {
+            font-size: clamp(1.25rem, 4vw, 2rem);
+            font-style: italic;
+            color: #a1a1aa;
+            border-left: 3px solid #357BE2;
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.6s ease-out;
+        }
+        .pain-quote.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ========== 解决方案区域 ========== */
+        .solution-section {
+            background: #0f0f0f;
+        }
+        .solution-card {
+            background: linear-gradient(135deg, rgba(53, 123, 226, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+            border: 1px solid rgba(53, 123, 226, 0.2);
+            border-radius: 16px;
+            padding: clamp(1.4rem, 2.2vw, 1.9rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            transition: all 0.3s ease;
+        }
+        .solution-card:hover {
+            border-color: rgba(53, 123, 226, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(53, 123, 226, 0.1);
+        }
+        .solution-icon {
+            margin-bottom: 0.9rem;
+        }
+        .feature-icon {
+            margin-bottom: 0.95rem;
+        }
+        .dv-icon-tile {
+            width: 50px;
+            height: 50px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #ffffff;
+            background: linear-gradient(135deg, #357BE2 0%, #6366f1 100%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 10px 22px rgba(53, 123, 226, 0.26);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .dv-icon-glyph {
+            width: 24px;
+            height: 24px;
+            color: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
+            transform: translateY(0.25px);
+        }
+        .solution-card h3 {
+            line-height: 1.26;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.55rem !important;
+        }
+        .solution-card p {
+            max-width: 24ch;
+            line-height: 1.64;
+        }
+
+        /* ========== 功能特性区域 ========== */
+        .feature-section {
+            background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: clamp(1.4rem, 2.2vw, 1.9rem);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #357BE2, transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(53, 123, 226, 0.3);
+            transform: translateY(-8px);
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ========== 对比表格区域 ========== */
+        .compare-section {
+            background: #0a0a0a;
+        }
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .compare-table th {
+            background: linear-gradient(135deg, #1a1a1a 0%, #262626 100%);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            white-space: nowrap;
+            line-height: 1.42;
+            vertical-align: middle;
+        }
+        .compare-table th:last-child {
+            background: linear-gradient(135deg, #357BE2 0%, #2563eb 100%);
+            color: white;
+            white-space: nowrap;
+        }
+        .compare-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        .compare-table th,
+        .compare-table td {
+            line-height: 1.58;
+        }
+        .compare-table tr:hover td {
+            background: rgba(53, 123, 226, 0.05);
+        }
+        .compare-table td:last-child {
+            color: #357BE2;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* ========== 场景区域 ========== */
+        .scenario-section {
+            background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
+        }
+        .scenario-card {
+            text-align: center;
+            padding: clamp(1.35rem, 1.9vw, 1.8rem) clamp(1rem, 1.6vw, 1.4rem);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .scenario-card:hover {
+            background: rgba(53, 123, 226, 0.1);
+            border-color: rgba(53, 123, 226, 0.3);
+            transform: scale(1.05);
+        }
+        .scenario-icon {
+            margin: 0 auto 1rem;
+        }
+
+        /* ========== 用户角色区域 ========== */
+        .user-section {
+            background: #0f0f0f;
+        }
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: clamp(1rem, 1.5vw, 1.2rem) clamp(1.1rem, 1.6vw, 1.4rem);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .user-card:hover {
+            background: rgba(53, 123, 226, 0.1);
+            border-color: rgba(53, 123, 226, 0.3);
+        }
+        .user-avatar {
+            margin: 0;
+        }
+        .user-avatar::before,
+        .user-avatar::after {
+            content: none;
+        }
+        .user-avatar svg {
+            opacity: 1;
+            position: static;
+            z-index: auto;
+        }
+        .user-card:hover .user-avatar {
+            transform: translateY(-1px);
+        }
+        .solution-card p,
+        .feature-card p,
+        .scenario-card p,
+        .user-card p {
+            line-height: 1.68;
+        }
+        .solution-card:hover .dv-icon-tile,
+        .feature-card:hover .dv-icon-tile,
+        .scenario-card:hover .dv-icon-tile,
+        .user-card:hover .dv-icon-tile {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(53, 123, 226, 0.32);
+        }
+
+        /* ========== CTA 区域 ========== */
+        .cta-section {
+            background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 50%, #111827 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(53, 123, 226, 0.3) 0%, transparent 70%);
+            filter: blur(100px);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 3rem;
+            background: linear-gradient(135deg, #357BE2 0%, #2563eb 100%);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-radius: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(53, 123, 226, 0.3);
+        }
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(53, 123, 226, 0.4);
+        }
+        .cta-button.secondary {
+            background: transparent;
+            color: #cbd5f5;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            box-shadow: none;
+        }
+        .cta-button.secondary:hover {
+            transform: translateY(-2px);
+            background: rgba(99, 102, 241, 0.08);
+            box-shadow: none;
+        }
+        .cta-section .text-center {
+            width: min(100%, 860px);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .solution-section .grid,
+        .feature-section .grid {
+            column-gap: clamp(1rem, 2vw, 1.5rem);
+            row-gap: clamp(1rem, 2vw, 1.5rem);
+        }
+        .scenario-section .grid {
+            column-gap: clamp(0.875rem, 1.8vw, 1.5rem);
+            row-gap: clamp(0.875rem, 1.8vw, 1.5rem);
+        }
+        .user-section .grid {
+            row-gap: clamp(0.875rem, 1.8vw, 1.25rem);
+        }
+
+        /* ========== 导航栏 ========== */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        .nav-bar.visible {
+            transform: translateY(0);
+        }
+
+        /* 返回按钮 */
+        .back-button {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* 进度指示器 */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #357BE2, #6366f1);
+            z-index: 102;
+            transition: width 0.1s linear;
+        }
+
+        /* ========== 浅色主题覆盖（与深色同构） ========== */
+        html[data-theme="light"] {
+            --intro-brand: #357be2;
+            --intro-brand-strong: #2f62dc;
+            --intro-text-strong: #0f172a;
+            --intro-text-body: #334155;
+            --intro-text-muted: #64748b;
+            --intro-border: rgba(148, 163, 184, 0.28);
+        }
+        html[data-theme="light"] body {
+            background: #f7fbff;
+            color: var(--intro-text-strong);
+        }
+        html[data-theme="light"] .hero-grid {
+            background-image:
+                linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+        }
+        html[data-theme="light"] .hero-glow {
+            opacity: 0.18;
+        }
+        html[data-theme="light"] .pain-section {
+            background: linear-gradient(180deg, #f7fbff 0%, #edf4ff 100%);
+        }
+        html[data-theme="light"] .solution-section {
+            background: #f2f7ff;
+        }
+        html[data-theme="light"] .feature-section {
+            background: linear-gradient(180deg, #f3f8ff 0%, #eef5ff 100%);
+        }
+        html[data-theme="light"] .compare-section {
+            background: #f7fbff;
+        }
+        html[data-theme="light"] .scenario-section {
+            background: linear-gradient(180deg, #f7fbff 0%, #edf4ff 100%);
+        }
+        html[data-theme="light"] .user-section {
+            background: #f2f7ff;
+        }
+        html[data-theme="light"] .cta-section {
+            background: linear-gradient(180deg, #edf4ff 0%, #f7fbff 50%, #e9f2ff 100%);
+        }
+
+        html[data-theme="light"] .pain-quote {
+            color: #475569;
+            border-left-color: var(--intro-brand);
+        }
+        html[data-theme="light"] .solution-card {
+            background: linear-gradient(135deg, rgba(53, 123, 226, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
+            border-color: rgba(53, 123, 226, 0.22);
+        }
+        html[data-theme="light"] .solution-card:hover {
+            border-color: rgba(53, 123, 226, 0.42);
+            box-shadow: 0 20px 40px rgba(53, 123, 226, 0.14);
+        }
+        html[data-theme="light"] .dv-icon-tile {
+            background: linear-gradient(135deg, #3f6fe8 0%, #5c86ff 100%);
+            box-shadow: 0 10px 22px rgba(53, 123, 226, 0.26);
+            border-color: rgba(255, 255, 255, 0.46);
+        }
+        html[data-theme="light"] .dv-icon-glyph {
+            color: #ffffff !important;
+        }
+
+        html[data-theme="light"] .feature-card,
+        html[data-theme="light"] .scenario-card,
+        html[data-theme="light"] .user-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--intro-border);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+        }
+        html[data-theme="light"] .feature-card:hover,
+        html[data-theme="light"] .scenario-card:hover,
+        html[data-theme="light"] .user-card:hover {
+            border-color: rgba(53, 123, 226, 0.35);
+            box-shadow: 0 20px 44px rgba(53, 123, 226, 0.14);
+        }
+        html[data-theme="light"] .scenario-card:hover {
+            background: rgba(53, 123, 226, 0.08);
+        }
+        html[data-theme="light"] .user-card:hover {
+            background: rgba(53, 123, 226, 0.08);
+        }
+
+        html[data-theme="light"] .compare-table th {
+            background: linear-gradient(135deg, #edf3ff 0%, #e6eeff 100%);
+            border-bottom-color: rgba(148, 163, 184, 0.34);
+            color: #1e293b;
+        }
+        html[data-theme="light"] .compare-table th + th {
+            border-left: 1px solid rgba(148, 163, 184, 0.24);
+        }
+        html[data-theme="light"] .compare-table th:last-child {
+            background: linear-gradient(135deg, #357be2 0%, #4f73f3 100%);
+            color: #ffffff;
+        }
+        html[data-theme="light"] .compare-table td {
+            border-bottom-color: rgba(148, 163, 184, 0.22);
+            color: var(--intro-text-body);
+        }
+        html[data-theme="light"] .compare-table tr:hover td {
+            background: rgba(53, 123, 226, 0.08);
+        }
+        html[data-theme="light"] .compare-table td:first-child {
+            color: var(--intro-text-body);
+            font-weight: 600;
+        }
+        html[data-theme="light"] .compare-table td:last-child {
+            color: #1f3f86;
+            font-weight: 700;
+        }
+
+        html[data-theme="light"] .nav-bar {
+            background: rgba(247, 251, 255, 0.82);
+            border-bottom-color: rgba(148, 163, 184, 0.24);
+        }
+        html[data-theme="light"] .back-button {
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(148, 163, 184, 0.42);
+            color: var(--intro-text-body);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        }
+        html[data-theme="light"] .back-button:hover {
+            background: #ffffff;
+            color: var(--intro-text-strong);
+        }
+        html[data-theme="light"] .cta-button {
+            background: linear-gradient(135deg, #2f67e8 0%, #357be2 56%, #4f79ff 100%);
+            box-shadow: 0 10px 30px rgba(53, 123, 226, 0.28);
+        }
+        html[data-theme="light"] .cta-button:hover {
+            box-shadow: 0 16px 42px rgba(53, 123, 226, 0.32);
+        }
+        html[data-theme="light"] .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.86);
+            color: var(--intro-brand-strong);
+            border-color: rgba(53, 123, 226, 0.38);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+        html[data-theme="light"] .cta-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.96);
+            color: #1e3a8a;
+            border-color: rgba(53, 123, 226, 0.48);
+        }
+        html[data-theme="light"] .cta-button.secondary,
+        html[data-theme="light"] .cta-button.secondary * {
+            color: inherit !important;
+        }
+
+        html[data-theme="light"] p.text-white,
+        html[data-theme="light"] h1.text-white,
+        html[data-theme="light"] h2.text-white,
+        html[data-theme="light"] h3.text-white,
+        html[data-theme="light"] span.text-white,
+        html[data-theme="light"] strong.text-white,
+        html[data-theme="light"] a.text-white {
+            color: var(--intro-text-strong) !important;
+        }
+        html[data-theme="light"] p .text-white,
+        html[data-theme="light"] h1 .text-white,
+        html[data-theme="light"] h2 .text-white,
+        html[data-theme="light"] h3 .text-white,
+        html[data-theme="light"] strong.text-white {
+            color: var(--intro-text-strong) !important;
+        }
+        html[data-theme="light"] .text-white\/80 {
+            color: rgba(15, 23, 42, 0.82) !important;
+        }
+        html[data-theme="light"] .text-gray-200 {
+            color: var(--intro-text-body) !important;
+        }
+        html[data-theme="light"] .text-gray-300 {
+            color: #475569 !important;
+        }
+        html[data-theme="light"] .text-gray-400 {
+            color: var(--intro-text-muted) !important;
+        }
+        html[data-theme="light"] .text-gray-500 {
+            color: var(--intro-text-muted) !important;
+        }
+        html[data-theme="light"] .text-gray-600 {
+            color: #475569 !important;
+        }
+        html[data-theme="light"] .section .text-center > p.reveal.text-lg,
+        html[data-theme="light"] .section .text-center > p.text-lg,
+        html[data-theme="light"] .section .text-center > p.reveal:not(.text-lg):not(.text-sm),
+        html[data-theme="light"] .section .text-center > p:not(.text-lg):not(.text-sm) {
+            color: var(--intro-text-muted);
+        }
+        html[data-theme="light"] .text-\[\#357BE2\] {
+            color: var(--intro-brand) !important;
+        }
+        html[data-theme="light"] .text-\[\#6366f1\] {
+            color: var(--intro-brand-strong) !important;
+        }
+        html[data-theme="light"] .hero-title .brand-title {
+            background-image: linear-gradient(90deg, #0f172a, #1e3a8a 52%, #357be2);
+        }
+        html[data-theme="light"] .hero-title .brand-title-cn {
+            color: rgba(15, 23, 42, 0.8) !important;
+        }
+        html[data-theme="light"] .scroll-indicator {
+            color: #64748b;
+        }
+        html[data-theme="light"] .scroll-indicator:hover {
+            color: var(--intro-brand);
+        }
+        html[data-theme="light"] .cta-glow {
+            background: radial-gradient(circle, rgba(53, 123, 226, 0.2) 0%, transparent 70%);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .section { padding: 52px 16px; }
+            .hero-glow { width: 400px; height: 400px; }
+            .compare-table { font-size: 0.875rem; }
+            .compare-table th, .compare-table td { padding: 0.75rem 1rem; }
+            .section .text-center.mb-16 { margin-bottom: 2.25rem; }
+            .section .text-center > p.reveal.text-lg,
+            .section .text-center > p.text-lg,
+            .section .text-center > p.reveal:not(.text-lg):not(.text-sm),
+            .section .text-center > p:not(.text-lg):not(.text-sm) {
+                max-width: 100%;
+                line-height: 1.66;
+            }
+            html { scroll-snap-type: y proximity; }
+        }
+
+        /* 减少动画（无障碍） */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 进度条 -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- 返回按钮 -->
+    <a href="index.html" class="back-button">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        返回应用
+    </a>
+
+    <!-- ========== Hero 区域 ========== -->
+    <section class="hero-section">
+        <div class="hero-glow hero-glow-1"></div>
+        <div class="hero-glow hero-glow-2"></div>
+        <div class="hero-grid"></div>
+
+        <div class="text-center relative z-10 max-w-4xl mx-auto px-6">
+            <!-- Logo -->
+            <div class="hero-title mb-8">
+                <svg class="logo-eye w-24 h-24 mx-auto" viewBox="0 0 96 96" fill="none">
+                    <circle cx="48" cy="48" r="40" stroke="url(#hero-ring)" stroke-width="3"/>
+                    <circle cx="48" cy="48" r="28" fill="url(#hero-iris)"/>
+                    <circle cx="48" cy="48" r="12" fill="#0a0a0a"/>
+                    <circle cx="40" cy="40" r="5" fill="white" opacity="0.9"/>
+                    <circle cx="54" cy="44" r="2.5" fill="white" opacity="0.6"/>
+                    <defs>
+                        <linearGradient id="hero-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#357BE2"/>
+                            <stop offset="100%" stop-color="#6366f1"/>
+                        </linearGradient>
+                        <radialGradient id="hero-iris" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#60a5fa"/>
+                            <stop offset="50%" stop-color="#357BE2"/>
+                            <stop offset="100%" stop-color="#1e40af"/>
+                        </radialGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <!-- 标题 -->
+            <h1 class="hero-title">
+                <span class="brand-title text-5xl md:text-7xl lg:text-8xl bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                    Deep Vision
+                </span>
+                <span class="brand-title-cn text-5xl md:text-7xl lg:text-8xl text-white/80 ml-4">深瞳</span>
+            </h1>
+
+            <!-- 副标题 -->
+            <p class="hero-subtitle text-xl md:text-2xl lg:text-3xl text-gray-200 mt-6 font-medium">
+                DeepInsight 深瞳，让需求变清晰
+            </p>
+
+            <!-- Tagline -->
+            <p class="hero-tagline text-lg md:text-xl text-gray-400 mt-4 max-w-2xl mx-auto">
+                通过智能访谈与自动报告，把模糊想法变成可执行方案
+            </p>
+
+            <!-- CTA -->
+            <div class="hero-cta mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="index.html?guide=1" class="cta-button">
+                    快速指引
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </a>
+                <a href="index.html" class="cta-button secondary">
+                    直接进入产品
+                </a>
+            </div>
+        </div>
+
+        <!-- 滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== 痛点区域 ========== -->
+    <section class="section pain-section">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="reveal text-3xl md:text-4xl font-bold text-center mb-4">
+                你是否也遇到过这些困境？
+            </h2>
+            <p class="reveal reveal-delay-1 text-gray-500 text-center mb-12">
+                这些场景，是否似曾相识？
+            </p>
+
+            <div class="space-y-6">
+                <blockquote class="pain-quote" data-delay="0">
+                    "客户说了很多，但我还是不知道他们真正想要什么。"
+                </blockquote>
+                <blockquote class="pain-quote" data-delay="200">
+                    "开了三小时的会，最后发现需求理解完全偏了。"
+                </blockquote>
+                <blockquote class="pain-quote" data-delay="400">
+                    "写方案的时间，比访谈的时间还长。"
+                </blockquote>
+                <blockquote class="pain-quote" data-delay="600">
+                    "每次访谈都像开盲盒，质量完全取决于谁来问。"
+                </blockquote>
+            </div>
+
+            <p class="reveal text-xl md:text-2xl text-center mt-12 text-white font-medium">
+                信息获取的低效，正在悄悄吞噬你的时间和精力。
+            </p>
+        </div>
+
+        <!-- 向下滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== 解决方案区域 ========== -->
+    <section class="section solution-section">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="reveal text-3xl md:text-4xl font-bold mb-4">
+                    重新定义<span class="text-[#357BE2]">"理解"</span>
+                </h2>
+                <p class="reveal reveal-delay-1 text-gray-400 text-lg max-w-3xl mx-auto">
+                    Deep Vision 深瞳,不只是一个访谈工具。<br>
+                    它是一种<strong class="text-white">全新的信息获取方式</strong>——通过 AI 驱动的选择式交互，<br>
+                    让复杂的需求挖掘变得简单、深入、可复制。
+                </p>
+            </div>
+
+            <p class="reveal text-center text-xl text-gray-300 mb-10">
+                <strong class="text-[#357BE2]">核心理念：</strong>让被访谈者只需做选择，让洞察自然涌现。
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="solution-card reveal reveal-delay-1">
+                    <div class="solution-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">以选择代替输入</h3>
+                    <p class="text-gray-400">降低表达门槛，让被访者轻松表达</p>
+                </div>
+
+                <div class="solution-card reveal reveal-delay-2">
+                    <div class="solution-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">以追问代替猜测</h3>
+                    <p class="text-gray-400">挖掘真实意图，直达需求本质</p>
+                </div>
+
+                <div class="solution-card reveal reveal-delay-3">
+                    <div class="solution-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">以知识代替盲区</h3>
+                    <p class="text-gray-400">实时联网补充专业视角</p>
+                </div>
+
+                <div class="solution-card reveal reveal-delay-4">
+                    <div class="solution-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">以体系代替碎片</h3>
+                    <p class="text-gray-400">自动生成洞察报告</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 向下滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== 功能特性区域 ========== -->
+    <section class="section feature-section">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="reveal text-3xl md:text-4xl font-bold mb-4">
+                    六大升级能力
+                </h2>
+                <p class="reveal reveal-delay-1 text-gray-400 text-lg">
+                    让第一次访谈更轻松，让结果更可用
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="feature-card reveal reveal-delay-1">
+                    <div class="feature-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h6m-6 4h8M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H7l-4 4V7a2 2 0 012-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">智能访谈引擎</h3>
+                    <p class="text-gray-400 text-sm">自动追问，层层深入，像专家一样拆解需求。</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-2">
+                    <div class="feature-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17h6m-6-4h6m-6-4h6M7 21h10a2 2 0 002-2V7l-6-4H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">结构化报告</h3>
+                    <p class="text-gray-400 text-sm">摘要 + 重点 + 建议，结论清晰可复用。</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m6 6V7m-9 4h12M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">可视化增强</h3>
+                    <p class="text-gray-400 text-sm">图表与重点信息更清晰，阅读效率更高。</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-4">
+                    <div class="feature-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L7 21h10l-2.75-4M12 3v10m0 0l3.5-3.5M12 13L8.5 9.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">演示文稿一键生成</h3>
+                    <p class="text-gray-400 text-sm">把报告直接转成可汇报演示稿。</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-5">
+                    <div class="feature-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h7"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">流程体验优化</h3>
+                    <p class="text-gray-400 text-sm">阶段导航更清晰，状态更明确，不再迷路。</p>
+                </div>
+
+                <div class="feature-card reveal reveal-delay-6">
+                    <div class="feature-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 11h10M7 15h6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H8l-3 3V7a2 2 0 012-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">会话与报告管理</h3>
+                    <p class="text-gray-400 text-sm">筛选、排序、状态管理更高效。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 向下滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== 对比区域 ========== -->
+    <section class="section compare-section">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="reveal text-3xl md:text-4xl font-bold mb-4">
+                    为什么选择深瞳？
+                </h2>
+                <p class="reveal reveal-delay-1 text-gray-400 text-lg">
+                    认知负担降低 <span class="text-[#357BE2] font-bold text-2xl">80%+</span>
+                </p>
+            </div>
+
+            <div class="reveal overflow-x-auto">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th class="w-[20%]">维度</th>
+                            <th class="w-[35%]">传统方式</th>
+                            <th class="w-[45%]">Deep Vision 深瞳</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-medium text-gray-300">信息获取</td>
+                            <td class="text-gray-500">开放式提问，信息发散</td>
+                            <td>选择式问答，聚焦关键</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium text-gray-300">表达门槛</td>
+                            <td class="text-gray-500">依赖对方表达能力</td>
+                            <td>AI 选项降低表达难度</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium text-gray-300">挖掘深度</td>
+                            <td class="text-gray-500">取决于提问者经验</td>
+                            <td>智能追问确保深度一致</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium text-gray-300">知识储备</td>
+                            <td class="text-gray-500">双方都可能有盲区</td>
+                            <td>实时联网补充专业知识</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium text-gray-300">结果呈现</td>
+                            <td class="text-gray-500">手工整理，耗时易漏</td>
+                            <td>自动生成结构化报告</td>
+                        </tr>
+                        <tr>
+                            <td class="font-medium text-gray-300">质量一致性</td>
+                            <td class="text-gray-500">人员水平差异大</td>
+                            <td>标准化流程，质量稳定</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="reveal mt-12 text-center">
+                <p class="text-lg text-gray-400 mb-4">从<span class="text-gray-300">"我该怎么说"</span>变成<span class="text-[#357BE2] font-semibold">"这个对不对"</span></p>
+            </div>
+        </div>
+
+        <!-- 向下滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== 场景区域 ========== -->
+    <section class="section scenario-section">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="reveal text-3xl md:text-4xl font-bold mb-4">
+                    不只是需求访谈
+                </h2>
+                <p class="reveal reveal-delay-1 text-gray-400 text-lg">
+                    深瞳的核心能力是<strong class="text-white">结构化信息获取</strong>，赋能更多场景
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <!-- 1. 产品需求 -->
+                <div class="scenario-card reveal reveal-delay-1">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">产品需求</h3>
+                    <p class="text-gray-500 text-sm">需求访谈、功能规划、PRD编写</p>
+                </div>
+
+                <!-- 2. 用户研究 -->
+                <div class="scenario-card reveal reveal-delay-2">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">用户研究</h3>
+                    <p class="text-gray-500 text-sm">用户画像构建、使用习惯调研</p>
+                </div>
+
+                <!-- 3. 技术方案 -->
+                <div class="scenario-card reveal reveal-delay-3">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">技术方案</h3>
+                    <p class="text-gray-500 text-sm">架构评审、技术选型、系统迁移</p>
+                </div>
+
+                <!-- 4. 商业模式 -->
+                <div class="scenario-card reveal reveal-delay-4">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">商业模式</h3>
+                    <p class="text-gray-500 text-sm">商业计划书、融资准备、战略规划</p>
+                </div>
+
+                <!-- 5. 竞品分析 -->
+                <div class="scenario-card reveal reveal-delay-5">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">竞品分析</h3>
+                    <p class="text-gray-500 text-sm">市场调研、竞品对比、差异化策略</p>
+                </div>
+
+                <!-- 6. 问题诊断 -->
+                <div class="scenario-card reveal reveal-delay-6">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">问题诊断</h3>
+                    <p class="text-gray-500 text-sm">故障排查、根因分析、问题定位</p>
+                </div>
+
+                <!-- 7. 招投标 -->
+                <div class="scenario-card reveal reveal-delay-1">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">招投标</h3>
+                    <p class="text-gray-500 text-sm">招标需求梳理、投标方案准备</p>
+                </div>
+
+                <!-- 8. 面试评估 -->
+                <div class="scenario-card reveal reveal-delay-2">
+                    <div class="scenario-icon dv-icon-tile">
+                        <svg class="dv-icon-glyph" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">面试评估</h3>
+                    <p class="text-gray-500 text-sm">候选人能力评估、专业评估报告</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 向下滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== 用户角色区域 ========== -->
+    <section class="section user-section">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="reveal text-3xl md:text-4xl font-bold mb-4">
+                    谁在使用深瞳？
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="user-card reveal reveal-delay-1">
+                    <div class="user-avatar dv-icon-tile" aria-hidden="true">
+                        <svg class="dv-icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="4" y="4" width="6" height="6" rx="1.5"></rect>
+                            <rect x="14" y="4" width="6" height="6" rx="1.5"></rect>
+                            <rect x="9" y="14" width="6" height="6" rx="1.5"></rect>
+                            <path d="M10 7h4"></path>
+                            <path d="M12 10v4"></path>
+                            <circle cx="7" cy="7" r="0.6"></circle>
+                            <circle cx="17" cy="7" r="0.6"></circle>
+                            <circle cx="12" cy="17" r="0.6"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">产品经理</h3>
+                        <p class="text-gray-500 text-sm">用户访谈、需求梳理、版本规划</p>
+                    </div>
+                </div>
+
+                <div class="user-card reveal reveal-delay-2">
+                    <div class="user-avatar dv-icon-tile" aria-hidden="true">
+                        <svg class="dv-icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="4" y="5" width="16" height="10" rx="2"></rect>
+                            <path d="M8 9h8"></path>
+                            <path d="M10 13h4"></path>
+                            <path d="M12 15v4"></path>
+                            <circle cx="6.5" cy="8.5" r="0.6"></circle>
+                            <circle cx="17.5" cy="8.5" r="0.6"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">售前顾问</h3>
+                        <p class="text-gray-500 text-sm">客户需求理解、方案准备</p>
+                    </div>
+                </div>
+
+                <div class="user-card reveal reveal-delay-3">
+                    <div class="user-avatar dv-icon-tile" aria-hidden="true">
+                        <svg class="dv-icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+                            <path d="M8 9h8"></path>
+                            <path d="M8 13h5"></path>
+                            <path d="M15 13l2 2 3-3"></path>
+                            <circle cx="6.5" cy="17" r="0.6"></circle>
+                            <circle cx="17.5" cy="17" r="0.6"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">项目经理</h3>
+                        <p class="text-gray-500 text-sm">干系人访谈、风险评估</p>
+                    </div>
+                </div>
+
+                <div class="user-card reveal reveal-delay-4">
+                    <div class="user-avatar dv-icon-tile" aria-hidden="true">
+                        <svg class="dv-icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M5 18h14"></path>
+                            <path d="M7 15v-4"></path>
+                            <path d="M12 18v-8"></path>
+                            <path d="M17 18v-6"></path>
+                            <circle cx="7" cy="10" r="1"></circle>
+                            <circle cx="12" cy="9" r="1"></circle>
+                            <circle cx="17" cy="11" r="1"></circle>
+                            <path d="M7 10h5"></path>
+                            <path d="M12 9h5"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">业务分析师</h3>
+                        <p class="text-gray-500 text-sm">业务流程梳理、系统分析</p>
+                    </div>
+                </div>
+
+                <div class="user-card reveal reveal-delay-5">
+                    <div class="user-avatar dv-icon-tile" aria-hidden="true">
+                        <svg class="dv-icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="7"></circle>
+                            <path d="M12 5v4"></path>
+                            <path d="M12 15v4"></path>
+                            <path d="M5 12h4"></path>
+                            <path d="M15 12h4"></path>
+                            <circle cx="12" cy="12" r="1.6"></circle>
+                            <circle cx="8" cy="8" r="0.6"></circle>
+                            <circle cx="16" cy="16" r="0.6"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">咨询顾问</h3>
+                        <p class="text-gray-500 text-sm">战略访谈、企业诊断</p>
+                    </div>
+                </div>
+
+                <div class="user-card reveal reveal-delay-6">
+                    <div class="user-avatar dv-icon-tile" aria-hidden="true">
+                        <svg class="dv-icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 4l2.5 5 5 .7-3.6 3.4.9 5.4L12 16l-4.8 2.5.9-5.4L4.5 9.7l5-.7L12 4z"></path>
+                            <path d="M12 10v3"></path>
+                            <circle cx="12" cy="7.2" r="0.6"></circle>
+                            <circle cx="16.2" cy="11.2" r="0.6"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">创业者</h3>
+                        <p class="text-gray-500 text-sm">市场验证、用户洞察</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 向下滚动指示 -->
+        <div class="scroll-indicator text-gray-500 flex flex-col items-center gap-2" onclick="scrollToNextSection(this)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ========== CTA 区域 ========== -->
+    <section class="section cta-section">
+        <div class="cta-glow"></div>
+        <div class="text-center relative z-10 max-w-3xl mx-auto">
+            <h2 class="reveal text-3xl md:text-5xl font-bold mb-6">
+                只需 3 步，完成第一次访谈
+            </h2>
+            <p class="reveal reveal-delay-1 text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+                一句话描述目标，DeepInsight 会帮你完成结构化访谈与报告生成。
+            </p>
+            <div class="reveal reveal-delay-2">
+                <a href="index.html?guide=1" class="cta-button">
+                    立即开始
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </a>
+            </div>
+
+            <p class="reveal reveal-delay-3 text-gray-600 text-sm mt-12">
+                © 2026 AI与创新研究院
+            </p>
+        </div>
+    </section>
+
+    <script>
+        // 获取所有章节
+        const allSections = document.querySelectorAll('.hero-section, .section');
+
+        // 点击滚动到下一个章节
+        function scrollToNextSection(el) {
+            const currentSection = el.closest('.hero-section, .section');
+            const sectionsArray = Array.from(allSections);
+            const currentIndex = sectionsArray.indexOf(currentSection);
+            if (currentIndex < sectionsArray.length - 1) {
+                sectionsArray[currentIndex + 1].scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // 获取当前可见 section 的索引
+        function getCurrentSectionIndex() {
+            let currentSectionIndex = 0;
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+            allSections.forEach((section, index) => {
+                const rect = section.getBoundingClientRect();
+                const sectionTop = window.scrollY + rect.top;
+                const sectionBottom = sectionTop + rect.height;
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                    currentSectionIndex = index;
+                }
+            });
+
+            return currentSectionIndex;
+        }
+
+        // 键盘导航
+        document.addEventListener('keydown', (e) => {
+            // 检查是否在输入框中，如果是则不响应
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            const currentSectionIndex = getCurrentSectionIndex();
+
+            // 向上键 - 回到上一个 section
+            if (e.key === 'ArrowUp' || e.key === 'Up') {
+                e.preventDefault();
+                if (currentSectionIndex > 0) {
+                    allSections[currentSectionIndex - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+                return;
+            }
+
+            // 向下键 - 滚动到下一个 section
+            if (e.key === 'ArrowDown' || e.key === 'Down') {
+                e.preventDefault();
+                if (currentSectionIndex < allSections.length - 1) {
+                    allSections[currentSectionIndex + 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+
+        // 滚动进度条
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // 滚动动画触发
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        // 监听 reveal 元素
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 痛点引用逐条显示
+        const painObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const quotes = entry.target.querySelectorAll('.pain-quote');
+                    quotes.forEach((quote, index) => {
+                        const delay = parseInt(quote.dataset.delay) || index * 200;
+                        setTimeout(() => {
+                            quote.classList.add('active');
+                        }, delay);
+                    });
+                    painObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.pain-section').forEach(el => {
+            painObserver.observe(el);
+        });
+    </script>
+</body>
+</html>

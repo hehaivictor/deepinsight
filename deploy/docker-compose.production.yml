@@ -1,0 +1,29 @@
+services:
+  deepinsight:
+    container_name: deepinsight
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.production
+    restart: unless-stopped
+    env_file:
+      - ../web/.env.production
+    environment:
+      TZ: Asia/Shanghai
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "5002:5002"
+    volumes:
+      - ../data:/app/data
+      - ../resources:/app/resources:ro
+      - ../artifacts:/app/artifacts
+      - ../output:/app/output
+    command:
+      - python3
+      - scripts/run_gunicorn.py
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:5002/api/status >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s

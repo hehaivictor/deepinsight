@@ -1,0 +1,131 @@
+{
+  "name": "account-merge",
+  "description": "手机号/微信绑定冲突与账号合并链路，优先验证 preview/apply/rollback 与权限边界。",
+  "risk_level": "high",
+  "contract": "account-merge",
+  "doctor_profile": "auto",
+  "guardrails_suite": "extended",
+  "smoke_suite": "minimal",
+  "strict_doctor": false,
+  "docs": [
+    "docs/agent/auth-identity.md",
+    "docs/agent/admin-ops.md"
+  ],
+  "mission": {
+    "summary": "把账号绑定冲突的一句话诉求先收口成“谁和谁合并、需要什么 preview 证据、用户会看到什么”的用户可见使命，再进入 merge workflow。",
+    "desired_outcomes": [
+      "先明确冲突来自手机号、微信还是 takeover 场景，不把多种身份冲突混成一次执行",
+      "先确认 merge preview、apply 和管理员 rollback 的进入条件与用户可见结果",
+      "先保留候选上下文、preview token 和回滚证据，再讨论正式合并"
+    ],
+    "acceptance_criteria": [
+      "merge preview 和 apply 继续要求候选上下文与活动预览，不绕开预演直接合并",
+      "手机号与微信冲突继续区分 takeover 与 merge_required，不误合并无关账号",
+      "管理员 rollback 入口保持有效，绑定后历史数据与业务壳状态不丢失"
+    ],
+    "non_goals": [
+      "不要在 mission 阶段直接决定真实账号的最终合并策略或生产级清理动作",
+      "不要绕开现有 merge preview / apply / rollback 接口手工修改 auth 数据"
+    ],
+    "risks": [
+      "账号合并同时影响鉴权身份、历史归属和登录壳切换，局部修复容易放大影响面",
+      "takeover、merge preview 和管理员 rollback 共用同一组边界，错误放宽会直接带来数据归属风险"
+    ],
+    "evidence_expectations": [
+      "artifacts/harness-runs/latest.json",
+      "artifacts/harness-runs/latest-handoff.json",
+      "tests.test_api_comprehensive.ComprehensiveApiTests.test_account_merge_preview_requires_login_and_candidate_context",
+      "tests.test_api_comprehensive.ComprehensiveApiTests.test_bind_wechat_conflict_redirects_to_merge_preview_and_apply"
+    ]
+  },
+  "planner": {
+    "summary": "先把冲突账号、候选上下文、preview/apply/rollback 证据和用户可见结果收口成正式计划，再进入绑定与合并执行。",
+    "scope_focus": [
+      "先明确是手机号冲突、微信冲突还是 takeover，避免把多个身份问题混成一个修复动作",
+      "先区分 merge preview、apply、管理员 rollback 三类动作的进入条件与证据",
+      "先定义候选上下文、preview token 和回滚证据这些必留信息，再讨论正式合并"
+    ],
+    "acceptance_focus": [
+      "merge preview / apply 继续要求候选上下文与活动预览，不会绕开预演直接落盘",
+      "冲突链路仍区分 takeover 与 merge_required，绑定结果不会误吞历史数据",
+      "管理员 rollback 入口和登录态切换在专项回归里保持成立"
+    ],
+    "non_goals": [
+      "不要在 Planner 阶段直接决定真实账号的最终合并策略或清理动作",
+      "不要绕开现有 merge preview / apply / rollback 接口手工改 auth 数据"
+    ],
+    "risks": [
+      "账号合并同时影响鉴权身份、历史归属和业务壳状态，局部修复很容易放大影响面",
+      "takeover、merge preview 和管理员 rollback 共用一套高风险边界，需要一起验证"
+    ]
+  },
+  "playbook": {
+    "output": "docs/agent/playbooks/account-merge-verify.md",
+    "title": "账号绑定与合并核对",
+    "summary": "先确认当前登录态和候选上下文，再验证 merge preview/apply/rollback 与 takeover 边界，不直接跳到高风险合并。",
+    "when_to_use": [
+      "手机号或微信绑定时提示存在历史账号，需要判断是否进入 merge preview / apply",
+      "用户反馈绑定后历史数据缺失、takeover 结果异常或 rollback 入口失效",
+      "需要确认 merge preview token、确认短语和管理员 rollback 链路是否仍完整"
+    ],
+    "command_blocks": [
+      {
+        "commands": [
+          "python3 scripts/agent_observe.py --profile auto",
+          "python3 scripts/agent_harness.py --task account-merge --profile auto --artifact-dir artifacts/harness-runs",
+          "python3 -m unittest tests.test_api_comprehensive.ComprehensiveApiTests.test_account_merge_preview_requires_login_and_candidate_context tests.test_api_comprehensive.ComprehensiveApiTests.test_account_merge_apply_requires_login_and_active_preview tests.test_api_comprehensive.ComprehensiveApiTests.test_bind_phone_conflict_requires_preview_apply_and_admin_rollback tests.test_api_comprehensive.ComprehensiveApiTests.test_bind_wechat_conflict_redirects_to_merge_preview_and_apply"
+        ]
+      }
+    ],
+    "artifact_files": [
+      "artifacts/harness-runs/latest.json",
+      "对应 run 目录下的 workflow.json",
+      "对应 run 目录下的 guardrails.json"
+    ],
+    "focus_points": [
+      "merge preview 是否仍要求候选上下文和 preview token",
+      "手机号与微信冲突时是否仍区分 takeover 与 merge_required",
+      "管理员 rollback 与普通用户 apply 的边界是否仍在",
+      "绑定链路改动后，登录态与业务壳切换是否受影响"
+    ],
+    "manual_confirmations": [
+      "对真实候选账号执行 merge apply",
+      "回滚已完成的账号合并",
+      "手工修改 preview token、确认短语或历史账号归属"
+    ]
+  },
+  "workflow": {
+    "mode": "verify_first",
+    "steps": [
+      {
+        "id": "read",
+        "title": "先读鉴权与账号合并文档",
+        "detail": "优先阅读 docs/agent/auth-identity.md，并对照 tests.test_api_comprehensive 中的 merge preview / apply / rollback 用例。"
+      },
+      {
+        "id": "verify",
+        "title": "跑绑定与合并专项回归",
+        "executor": "unittest",
+        "quiet": true,
+        "cases": [
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_account_merge_preview_requires_login_and_candidate_context",
+            "label": "merge preview 上下文要求"
+          },
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_account_merge_apply_requires_login_and_active_preview",
+            "label": "merge apply 必须依赖活动预览"
+          },
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_bind_phone_conflict_requires_preview_apply_and_admin_rollback",
+            "label": "手机号冲突 merge / rollback"
+          },
+          {
+            "test_id": "tests.test_api_comprehensive.ComprehensiveApiTests.test_bind_wechat_conflict_redirects_to_merge_preview_and_apply",
+            "label": "微信冲突 merge preview / apply"
+          }
+        ]
+      }
+    ]
+  }
+}
