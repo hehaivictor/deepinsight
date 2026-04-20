@@ -1,7 +1,21 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "releaseDate": "2026-04-20",
   "changelog": [
+    {
+      "version": "1.0.1",
+      "date": "2026-04-20",
+      "type": "patch",
+      "title": "替换全站产品 Logo 为聚焦方阵设计",
+      "changes": [
+        "favicon.svg：替换为四层嵌套方块 + 十字辅助线",
+        "index.html：导航栏 logo 替换，保留 logo-pulse 动画兼容",
+        "intro.html：Hero 区大 logo 替换",
+        "help.html：帮助文档页导航栏 logo 替换",
+        "solution.js：方案页 topbar 品牌标记从文字 DV 替换为 SVG logo",
+        "solution.css：清除 .solution-brand-mark 旧背景渐变和边框样式"
+      ]
+    },
     {
       "version": "1.0.0",
       "date": "2026-04-20",
