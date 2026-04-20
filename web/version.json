@@ -1,7 +1,22 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "releaseDate": "2026-04-20",
   "changelog": [
+    {
+      "version": "1.0.2",
+      "date": "2026-04-20",
+      "type": "patch",
+      "title": "完善前后端功能链路",
+      "changes": [
+        "Logo 色阶：深靛蓝（#3730A3）→ 科技蓝（#1D4ED8/#1E3A8A）",
+        "主界面品牌色：Manus 蓝（#357BE2）→ #1D4ED8，暗色主题同步为 #60A5FA",
+        "方案页 cyan 系（#60d5ff）→ 蓝色阶（#60A5FA），背景光晕同步",
+        "app.js blockquote 边框、Word 导出色统一为品牌蓝",
+        "solution.js 图表第一色替换为品牌蓝",
+        "server.py Mermaid 图表 classDef 同步更新",
+        "语义色（红/橙/绿）与方案页金色 accent 保持不动"
+      ]
+    },
     {
       "version": "1.0.1",
       "date": "2026-04-20",
