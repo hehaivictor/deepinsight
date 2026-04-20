@@ -2451,7 +2451,7 @@ function deepInsight() {
                 return active ? 'dv-dark-theme-option-active' : 'dv-dark-theme-option';
             }
             return active
-                ? 'bg-gray-900 text-white border-gray-900'
+                ? 'bg-blue-700 text-white border-blue-700'
                 : 'text-gray-600 border-transparent hover:bg-gray-100 hover:text-gray-900';
         },
 
@@ -2460,7 +2460,7 @@ function deepInsight() {
                 return isActive ? 'dv-dark-nav-active' : 'dv-dark-nav';
             }
             return isActive
-                ? 'bg-gray-900 text-white'
+                ? 'bg-blue-700 text-white'
                 : 'text-primary hover:bg-surface-secondary';
         },
 

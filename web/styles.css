@@ -460,10 +460,10 @@
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.26);
 }
 
-.theme-menu-item.bg-gray-900:hover {
-    background: #111827;
+.theme-menu-item.bg-blue-700:hover {
+    background: #1E40AF;
     color: #ffffff;
-    border-color: #111827;
+    border-color: #1E40AF;
 }
 
 .account-menu-section-title {
