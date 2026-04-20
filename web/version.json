@@ -1,7 +1,18 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "releaseDate": "2026-04-20",
   "changelog": [
+    {
+      "version": "1.0.3",
+      "date": "2026-04-20",
+      "type": "patch",
+      "title": "还原 Tailwind primary/cta/danger 配置，按钮 active 改用 bg-blue-700",
+      "changes": [
+        "还原 primary/cta/danger 为原始黑色，避免文字颜色被误改",
+        "筛选按钮、分页、排序、报告模式指示器的 active 状态改用 bg-blue-700",
+        "只影响按钮背景色，不影响文字颜色"
+      ]
+    },
     {
       "version": "1.0.2",
       "date": "2026-04-20",
