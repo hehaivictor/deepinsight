@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "branch": "main",
+  "baseRef": "origin/main",
+  "sourceCommit": "157ba2b",
+  "committedAt": "2026-04-20T19:40:34+08:00",
+  "versionType": "patch",
+  "title": "还原 Tailwind primary/cta/danger 配置，按钮 active 改用 bg-blue-700",
+  "changes": [
+    "还原 primary/cta/danger 为原始黑色，避免文字颜色被误改",
+    "筛选按钮、分页、排序、报告模式指示器的 active 状态改用 bg-blue-700",
+    "只影响按钮背景色，不影响文字颜色"
+  ],
+  "changedFiles": [
+    "web/index.html"
+  ]
+}

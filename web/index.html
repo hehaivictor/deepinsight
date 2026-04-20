@@ -323,10 +323,10 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#1D4ED8',
+                        primary: '#000000',
                         secondary: '#525252',
-                        cta: '#1D4ED8',
-                        'cta-hover': '#1E40AF',
+                        cta: '#000000',
+                        'cta-hover': '#262626',
                         surface: '#FFFFFF',
                         'surface-secondary': '#FAFAFA',
                         text: '#000000',
@@ -334,7 +334,7 @@
                         border: '#E5E5E5',
                         success: '#22C55E',
                         warning: '#737373',
-                        danger: '#DC2626'
+                        danger: '#000000'
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
@@ -1136,34 +1136,34 @@
                                 <div class="flex flex-wrap items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2 py-1.5 w-fit max-w-full">
                                     <span class="text-xs text-muted px-1">显示方式</span>
                                     <button @click="sessionGroupBy = 'none'; filterSessions()"
-                                            :class="sessionGroupBy === 'none' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="sessionGroupBy === 'none' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         不分组
                                     </button>
                                     <button @click="sessionGroupBy = 'scenario'; filterSessions()"
-                                            :class="sessionGroupBy === 'scenario' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="sessionGroupBy === 'scenario' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         按场景
                                     </button>
                                     <button @click="sessionGroupBy = 'date'; filterSessions()"
-                                            :class="sessionGroupBy === 'date' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="sessionGroupBy === 'date' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         按日期
                                     </button>
                                     <button @click="sessionGroupBy = 'status'; filterSessions()"
-                                            :class="sessionGroupBy === 'status' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="sessionGroupBy === 'status' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         按状态
                                     </button>
                                     <span class="w-px h-4 bg-gray-200 mx-0.5"></span>
                                     <span class="text-xs text-muted px-1">排序</span>
                                     <button @click="sessionSortOrder = 'newest'; filterSessions()"
-                                            :class="sessionSortOrder === 'newest' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="sessionSortOrder === 'newest' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         最新
                                     </button>
                                     <button @click="sessionSortOrder = 'oldest'; filterSessions()"
-                                            :class="sessionSortOrder === 'oldest' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="sessionSortOrder === 'oldest' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         最早
                                     </button>
@@ -1343,7 +1343,7 @@
 
                                         <template x-for="page in visiblePages" :key="page">
                                             <button @click="page !== '...' && goToPage(page)"
-                                                    :class="page === currentPage ? 'bg-primary text-white' : (page === '...' ? 'cursor-default' : 'hover:bg-gray-100 cursor-pointer')"
+                                                    :class="page === currentPage ? 'bg-blue-700 text-white' : (page === '...' ? 'cursor-default' : 'hover:bg-gray-100 cursor-pointer')"
                                                     class="min-w-[36px] h-9 px-3 rounded-lg border border-gray-200 text-sm font-medium transition-colors"
                                                     x-text="page">
                                             </button>
@@ -2220,7 +2220,7 @@
                                                         <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
                                                              :class="reportProfile === profile ? 'border-primary' : 'border-gray-400'">
                                                             <div class="w-4 h-4 rounded-full"
-                                                                 :class="reportProfile === profile ? 'bg-primary' : 'bg-transparent'"></div>
+                                                                 :class="reportProfile === profile ? 'bg-blue-700' : 'bg-transparent'"></div>
                                                         </div>
                                                         <div class="min-w-0 flex-1">
                                                             <div class="text-2xl font-semibold text-primary" x-text="getReportProfileLabel(profile)"></div>
@@ -2364,29 +2364,29 @@
                                 <div class="flex flex-wrap items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2 py-1.5 w-fit max-w-full">
                                     <span class="text-xs text-muted px-1">显示方式</span>
                                     <button @click="reportGroupBy = 'none'; filterReports()"
-                                            :class="reportGroupBy === 'none' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="reportGroupBy === 'none' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         不分组
                                     </button>
                                     <button @click="reportGroupBy = 'scenario'; filterReports()"
-                                            :class="reportGroupBy === 'scenario' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="reportGroupBy === 'scenario' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         按场景
                                     </button>
                                     <button @click="reportGroupBy = 'date'; filterReports()"
-                                            :class="reportGroupBy === 'date' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="reportGroupBy === 'date' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         按日期
                                     </button>
                                     <span class="w-px h-4 bg-gray-200 mx-0.5"></span>
                                     <span class="text-xs text-muted px-1">排序</span>
                                     <button @click="reportSortOrder = 'newest'; filterReports()"
-                                            :class="reportSortOrder === 'newest' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="reportSortOrder === 'newest' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         最新
                                     </button>
                                     <button @click="reportSortOrder = 'oldest'; filterReports()"
-                                            :class="reportSortOrder === 'oldest' ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
+                                            :class="reportSortOrder === 'oldest' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'"
                                             class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap">
                                         最早
                                     </button>
