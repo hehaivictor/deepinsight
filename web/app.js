@@ -1,5 +1,5 @@
 /**
- * Deep Vision - AI 驱动的智能访谈前端
+ * DeepInsight - AI 驱动的智能访谈前端
  *
  * 核心功能：
  * - 调用后端 AI API 动态生成问题和选项
@@ -23,7 +23,7 @@ const QUESTION_TYPING_CHAR_DELAY_MS = 14;
 const QUESTION_OPTION_REVEAL_DELAY_MS = 70;
 const QUESTION_INTERACTION_READY_DELAY_MS = 80;
 
-function deepVision() {
+function deepInsight() {
     const app = {
         // ============ 状态 ============
         currentView: 'sessions',

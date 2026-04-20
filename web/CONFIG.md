@@ -1,4 +1,4 @@
-# Deep Vision 前端配置说明
+# DeepInsight 前端配置说明
 
 本文档只说明 [site-config.js](/Users/hehai/Documents/开目软件/Agents/project/DeepInsight/web/site-config.js) 的前端展示配置。
 

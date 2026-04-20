@@ -4,9 +4,9 @@
 # dependencies = ["flask", "flask-cors", "anthropic", "requests", "reportlab", "pillow", "jdcloud-sdk", "psycopg[binary]", "boto3"]
 # ///
 """
-Deep Vision Web Server - AI 驱动版本
+DeepInsight Web Server - AI 驱动版本
 
-完整实现 deep-vision 技能的所有功能：
+完整实现 deepinsight 技能的所有功能：
 - 动态生成问题和选项（基于上下文和行业知识）
 - 智能追问（识别表面需求，挖掘本质）
 - 冲突检测（检测回答与参考文档的冲突）
@@ -3673,7 +3673,7 @@ def _write_admin_config_updates(updates: dict[str, Any]) -> Path:
 
     with ADMIN_SETTINGS_WRITE_LOCK:
         existing_text = config_path.read_text(encoding="utf-8") if config_path.exists() else (
-            "\"\"\"Deep Vision 本地策略配置（由管理员中心可选覆盖）\"\"\"\n"
+            "\"\"\"DeepInsight 本地策略配置（由管理员中心可选覆盖）\"\"\"\n"
         )
         managed_values = _read_admin_managed_config_values(config_path)
         managed_values.update(updates)
@@ -3695,7 +3695,7 @@ def _render_admin_site_config_file(values: dict[str, Any]) -> str:
     serialized = json.dumps(values, ensure_ascii=False, indent=2)
     return (
         "/**\n"
-        " * Deep Vision 前端配置文件\n"
+        " * DeepInsight 前端配置文件\n"
         " *\n"
         " * 此文件由管理员中心维护。\n"
         " * 修改后请刷新浏览器页面生效。\n"
@@ -16726,7 +16726,7 @@ def build_session_report_filename(session: dict, now: Optional[datetime] = None)
     if not session_token:
         raise ValueError("session_id 无效，无法生成报告文件名")
 
-    parts = ["deep-vision", date_str]
+    parts = ["deepinsight", date_str]
     scope_tag = get_instance_scope_short_tag()
     if scope_tag:
         parts.append(scope_tag)
@@ -17165,7 +17165,7 @@ class MCPClient:
                 "protocolVersion": "2024-11-05",
                 "capabilities": {},
                 "clientInfo": {
-                    "name": "deep-vision",
+                    "name": "deepinsight",
                     "version": "1.0.0"
                 }
             })
@@ -17691,7 +17691,7 @@ def generate_search_query(topic: str, dimension: str, context: dict) -> str:
         return f"{topic} {dim_name}"
 
 
-# ============ Deep Vision AI 核心逻辑 ============
+# ============ DeepInsight AI 核心逻辑 ============
 
 DIMENSION_INFO = {
     "customer_needs": {
@@ -20520,7 +20520,7 @@ xychart-beta
 - 客观公正，既要指出优势也要指出不足
 - 报告要专业、结构清晰、有理有据
 - 使用 Markdown 格式
-- 报告末尾使用署名：*此报告由 Deep Vision 深瞳生成*
+- 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*
 
 请生成完整的评估报告："""
 
@@ -20678,7 +20678,7 @@ def build_compact_report_prompt(session: dict, evidence_pack: Optional[dict] = N
 3. 结论优先引用 Q 编号；信息不足时明确写“暂无数据”或“待补充”。
 4. component 为 `table` 时输出 Markdown 表格；为 `list` 时输出列表；为 `mermaid` 时输出 ```mermaid 代码块。
 5. 内容要紧凑、结论先行，避免大段空话和重复表述。
-6. 报告末尾使用署名：*此报告由 Deep Vision 深瞳生成*{schema_issue_notice}
+6. 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*{schema_issue_notice}
 
 请直接生成完整报告："""
 
@@ -20712,7 +20712,7 @@ def build_compact_report_prompt(session: dict, evidence_pack: Optional[dict] = N
 4. 可视化分析可包含 Mermaid，但仅保留 1-2 个最有价值的图，不要堆砌。
 5. 所有关键结论尽量引用 Q 编号；信息不足时明确写“暂无数据”。
 6. 内容要紧凑、结论先行，避免大段空话和重复表述。
-7. 报告末尾使用署名：*此报告由 Deep Vision 深瞳生成*
+7. 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*
 
 请直接生成完整报告："""
 
@@ -20827,7 +20827,7 @@ def build_report_prompt_with_options(session: dict, evidence_pack: Optional[dict
 3. 关键结论优先引用问答证据（Q数字），不得编造访谈事实。
 4. 若某章节信息不足，明确写出“暂无数据”或“待补充”，不得空章节。
 5. flowchart 连接线标签必须使用 `A -->|标签| B` 语法。
-6. 报告末尾使用署名：*此报告由 Deep Vision 深瞳生成*{schema_issue_notice}
+6. 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*{schema_issue_notice}
 
 请生成完整的报告："""
     else:
@@ -20998,7 +20998,7 @@ flowchart TD
 - 报告要专业、结构清晰、可操作
 - **Mermaid 语法要求严格，请仔细检查每个图表的语法正确性**
 - **flowchart 连接线带标签语法必须是 `A -->|标签| B`，禁止使用 `A --|标签|--> B`**
-- 报告末尾使用署名：*此报告由 Deep Vision 深瞳生成*
+- 报告末尾使用署名：*此报告由 DeepInsight 深瞳生成*
 
 请生成完整的报告："""
 
@@ -24870,7 +24870,7 @@ def build_report_temporal_fields(generated_at: Optional[datetime] = None) -> dic
         "interview_date": local_now.strftime("%Y-%m-%d"),
         "generated_datetime_cn": local_now.strftime("%Y年%m月%d日 %H:%M"),
         "generated_datetime_iso_minute": local_now.strftime("%Y-%m-%d %H:%M"),
-        "report_id": f"deep-vision-{local_now.strftime('%Y%m%d-%H%M')}",
+        "report_id": f"deepinsight-{local_now.strftime('%Y%m%d-%H%M')}",
     }
 
 
@@ -25300,7 +25300,7 @@ def render_report_from_draft_custom_v1(session: dict, draft: dict, quality_meta:
         lines.append("")
 
     lines.extend([
-        "*此报告由 Deep Vision 深瞳生成*",
+        "*此报告由 DeepInsight 深瞳生成*",
         "",
     ])
     return "\n".join(lines)
@@ -25465,7 +25465,7 @@ def render_report_from_draft_assessment_v1(session: dict, draft: dict, quality_m
         "",
         *open_questions_table,
         "",
-        "*此报告由 Deep Vision 深瞳生成*",
+        "*此报告由 DeepInsight 深瞳生成*",
         "",
     ]
     return "\n".join(lines)
@@ -25781,7 +25781,7 @@ def render_report_from_draft_v3(session: dict, draft: dict, quality_meta: dict) 
         "",
         *open_questions_table,
         "",
-        "*此报告由 Deep Vision 深瞳生成*",
+        "*此报告由 DeepInsight 深瞳生成*",
         "",
     ]
 
@@ -31963,7 +31963,7 @@ def generate_simple_report(session: dict) -> str:
     content += generate_interview_appendix(session)
 
     content += """
-*此报告由 Deep Vision 深瞳生成*
+*此报告由 DeepInsight 深瞳生成*
 """
 
     return content
@@ -43565,7 +43565,7 @@ if __name__ == '__main__':
         ai_state_label = "不可用"
 
     print("=" * 60)
-    print("Deep Vision Web Server - AI 驱动版本")
+    print("DeepInsight Web Server - AI 驱动版本")
     print("=" * 60)
     print(f"Sessions: {SESSIONS_DIR}")
     print(f"Reports: {REPORTS_DIR}")

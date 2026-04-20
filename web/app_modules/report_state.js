@@ -171,8 +171,8 @@
 
             let normalized = reportName.trim();
             normalized = normalized.replace(/\.[^.]+$/, '');
-            normalized = normalized.replace(/^deep-vision-\d{8}-/i, '');
-            normalized = normalized.replace(/^deep-vision-/i, '');
+            normalized = normalized.replace(/^deepinsight-\d{8}-/i, '');
+            normalized = normalized.replace(/^deepinsight-/i, '');
             normalized = normalized.replace(/[-_]+/g, ' ').trim();
 
             return normalized || reportName;

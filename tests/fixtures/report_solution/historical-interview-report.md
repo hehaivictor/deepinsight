@@ -371,7 +371,7 @@ flowchart TD
 
 ---
 
-*此报告由 Deep Vision 深瞳生成*
+*此报告由 DeepInsight 深瞳生成*
 
 ---
 

@@ -409,7 +409,7 @@ class ComprehensiveApiTests(unittest.TestCase):
 
     def _build_scoped_report_name(self, topic, date_str="20990101", session_id=""):
         slug = self.server.normalize_topic_slug(topic)
-        parts = ["deep-vision", date_str]
+        parts = ["deepinsight", date_str]
         tag = self.server.get_instance_scope_short_tag()
         if tag:
             parts.append(tag)
@@ -2382,7 +2382,7 @@ class ComprehensiveApiTests(unittest.TestCase):
         user = self._register()
         user_id = int(user["id"])
         for i in range(25):
-            report_name = f"deep-vision-20990101-report-{i:02d}.md"
+            report_name = f"deepinsight-20990101-report-{i:02d}.md"
             report_file = self.server.REPORTS_DIR / report_name
             report_file.write_text(f"# report {i}\n", encoding="utf-8")
             self.server.set_report_owner_id(report_name, user_id)
@@ -4552,7 +4552,7 @@ class ComprehensiveApiTests(unittest.TestCase):
         content = get_report_resp.get_json().get("content", "")
         self.assertIn("访谈报告", content)
         self.assertIn("**生成日期**:", content)
-        self.assertIn("**报告编号**: deep-vision-", content)
+        self.assertIn("**报告编号**: deepinsight-", content)
         self.assertIn("问题 1：需求是什么？", content)
         self.assertIn("】问题 1：需求是什么？", content)
         self.assertNotIn("Q1:", content)

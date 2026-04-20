@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="shortcut icon" href="favicon.svg">
-    <title>Deep Vision 深瞳</title>
+    <title>DeepInsight 深瞳</title>
     <!-- 本地化资源 - 支持内网部署 -->
     <script>
         // 主题预加载：避免刷新时闪烁
@@ -683,11 +683,11 @@
     <script defer src="vendor/js/alpine.min.js"></script>
 </head>
 <body class="bg-surface-secondary min-h-screen font-sans text-text antialiased pb-safe">
-    <div x-data="deepVision()" x-cloak class="min-h-screen flex flex-col">
+    <div x-data="deepInsight()" x-cloak class="min-h-screen flex flex-col">
         <!-- Header -->
         <header class="bg-surface border-b border-border">
             <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-5 flex items-center justify-between">
-                <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" @click="window.location.href='intro.html'" title="了解 Deep Vision">
+                <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" @click="window.location.href='intro.html'" title="了解 DeepInsight">
                     <div class="relative logo-icon" :class="webSearching ? 'logo-searching' : ''">
                         <svg class="w-9 h-9" viewBox="0 0 40 40" fill="none">
                             <!-- 外圈光晕 -->
@@ -722,7 +722,7 @@
                     </div>
                     <div class="flex flex-col">
                         <h1 class="text-xl leading-tight">
-                            <span class="brand-title">Deep</span><span class="brand-title">Vision</span>
+                            <span class="brand-title">DeepInsight</span>
                             <span class="brand-title-cn ml-1.5">深瞳</span>
                         </h1>
                         <p class="text-xs text-muted tracking-wide">洞察深处，方见真章</p>

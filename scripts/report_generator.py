@@ -419,7 +419,7 @@ def generate_simple_report(session: dict) -> str:
         "",
         f"**访谈日期**: {now.strftime('%Y-%m-%d %H:%M')}",
         f"**访谈场景**: {scenario}",
-        f"**报告编号**: deep-vision-{now.strftime('%Y%m%d')}-{slugify(topic)}",
+        f"**报告编号**: deepinsight-{now.strftime('%Y%m%d')}-{slugify(topic)}",
         "",
         "---",
         "",
@@ -839,7 +839,7 @@ def generate_report(session_id: str, output_path: Optional[str] = None) -> Optio
     else:
         topic_slug = slugify(session.get("topic", "report"))
         date_str = datetime.now().strftime("%Y%m%d")
-        filename = f"deep-vision-{date_str}-{topic_slug}.md"
+        filename = f"deepinsight-{date_str}-{topic_slug}.md"
         output_file = get_reports_dir() / filename
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
