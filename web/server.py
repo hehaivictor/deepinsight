@@ -43080,8 +43080,7 @@ def admin_set_license_enforcement():
     if enabled is None:
         return jsonify({"error": "缺少 enabled 参数"}), 400
     sync_default = bool(data.get("sync_default", False))
-    user = get_current_user()
-    actor_user_id = user.get("id") if user else None
+    actor_user_id = get_current_user_id_or_none()
     state = set_license_enforcement_override(
         enabled=bool(enabled),
         actor_user_id=actor_user_id,
@@ -43098,8 +43097,7 @@ def admin_set_license_enforcement():
 @require_admin
 @require_valid_license
 def admin_follow_license_enforcement_default():
-    user = get_current_user()
-    actor_user_id = user.get("id") if user else None
+    actor_user_id = get_current_user_id_or_none()
     state = set_license_enforcement_override(
         enabled=None,
         actor_user_id=actor_user_id,
