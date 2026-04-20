@@ -5637,7 +5637,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="settings-group space-y-2">
+                            <div x-show="canUseAccountBinding()" x-cloak class="settings-group space-y-2">
                                 <h4 class="text-sm font-semibold text-primary">绑定操作</h4>
                                 <button @click="startWechatBind()"
                                         x-show="!currentUser?.wechat_bound"
@@ -5646,7 +5646,7 @@
                                     <span x-text="wechatBindLoading ? '正在跳转微信...' : '绑定微信'"></span>
                                 </button>
                                 <button @click="openBindPhoneModal()"
-                                        x-show="!currentUser?.phone && smsLoginEnabled"
+                                        x-show="!currentUser?.phone"
                                         :disabled="bindPhoneLoading"
                                         class="settings-action-btn w-full text-left px-3 py-2.5 rounded-lg border text-sm font-medium">
                                     绑定手机号
@@ -5825,7 +5825,7 @@
         </div>
 
         <!-- ========== 绑定手机号弹窗 ========== -->
-        <div x-show="showBindPhoneModal && smsLoginEnabled"
+        <div x-show="showBindPhoneModal && canUseAccountBinding()"
              data-dialog-key="showBindPhoneModal"
              x-bind="getDialogAttrs('showBindPhoneModal')"
              x-transition:enter="transition ease-out duration-200"
