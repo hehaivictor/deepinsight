@@ -94,7 +94,7 @@
             pointer-events: none;
         }
         .hero-glow-1 {
-            background: radial-gradient(circle, #357BE2 0%, transparent 70%);
+            background: radial-gradient(circle, #1D4ED8 0%, transparent 70%);
             top: -200px;
             left: -200px;
             animation: float 20s ease-in-out infinite;
@@ -156,11 +156,11 @@
         }
         @keyframes pulse-glow {
             0%, 100% {
-                filter: drop-shadow(0 0 20px rgba(53, 123, 226, 0.5));
+                filter: drop-shadow(0 0 20px rgba(29, 78, 216, 0.5));
                 transform: scale(1);
             }
             50% {
-                filter: drop-shadow(0 0 40px rgba(53, 123, 226, 0.8));
+                filter: drop-shadow(0 0 40px rgba(29, 78, 216, 0.8));
                 transform: scale(1.02);
             }
         }
@@ -178,7 +178,7 @@
             z-index: 10;
         }
         .scroll-indicator:hover {
-            color: #357BE2;
+            color: #1D4ED8;
         }
         @keyframes fadeInUpCentered {
             to {
@@ -266,7 +266,7 @@
             font-size: clamp(1.25rem, 4vw, 2rem);
             font-style: italic;
             color: #a1a1aa;
-            border-left: 3px solid #357BE2;
+            border-left: 3px solid #1D4ED8;
             padding-left: 1.5rem;
             margin: 1.5rem 0;
             opacity: 0;
@@ -283,8 +283,8 @@
             background: #0f0f0f;
         }
         .solution-card {
-            background: linear-gradient(135deg, rgba(53, 123, 226, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
-            border: 1px solid rgba(53, 123, 226, 0.2);
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+            border: 1px solid rgba(29, 78, 216, 0.2);
             border-radius: 16px;
             padding: clamp(1.4rem, 2.2vw, 1.9rem);
             display: flex;
@@ -293,9 +293,9 @@
             transition: all 0.3s ease;
         }
         .solution-card:hover {
-            border-color: rgba(53, 123, 226, 0.5);
+            border-color: rgba(29, 78, 216, 0.5);
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(53, 123, 226, 0.1);
+            box-shadow: 0 20px 40px rgba(29, 78, 216, 0.1);
         }
         .solution-icon {
             margin-bottom: 0.9rem;
@@ -312,9 +312,9 @@
             justify-content: center;
             flex-shrink: 0;
             color: #ffffff;
-            background: linear-gradient(135deg, #357BE2 0%, #6366f1 100%);
+            background: linear-gradient(135deg, #1D4ED8 0%, #6366f1 100%);
             border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 10px 22px rgba(53, 123, 226, 0.26);
+            box-shadow: 0 10px 22px rgba(29, 78, 216, 0.26);
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
         .dv-icon-glyph {
@@ -357,13 +357,13 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #357BE2, transparent);
+            background: linear-gradient(90deg, transparent, #1D4ED8, transparent);
             opacity: 0;
             transition: opacity 0.3s;
         }
         .feature-card:hover {
             background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(53, 123, 226, 0.3);
+            border-color: rgba(29, 78, 216, 0.3);
             transform: translateY(-8px);
         }
         .feature-card:hover::before {
@@ -392,7 +392,7 @@
             vertical-align: middle;
         }
         .compare-table th:last-child {
-            background: linear-gradient(135deg, #357BE2 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
             color: white;
             white-space: nowrap;
         }
@@ -407,10 +407,10 @@
             line-height: 1.58;
         }
         .compare-table tr:hover td {
-            background: rgba(53, 123, 226, 0.05);
+            background: rgba(29, 78, 216, 0.05);
         }
         .compare-table td:last-child {
-            color: #357BE2;
+            color: #1D4ED8;
             font-weight: 500;
             white-space: nowrap;
         }
@@ -428,8 +428,8 @@
             transition: all 0.3s ease;
         }
         .scenario-card:hover {
-            background: rgba(53, 123, 226, 0.1);
-            border-color: rgba(53, 123, 226, 0.3);
+            background: rgba(29, 78, 216, 0.1);
+            border-color: rgba(29, 78, 216, 0.3);
             transform: scale(1.05);
         }
         .scenario-icon {
@@ -451,8 +451,8 @@
             transition: all 0.3s ease;
         }
         .user-card:hover {
-            background: rgba(53, 123, 226, 0.1);
-            border-color: rgba(53, 123, 226, 0.3);
+            background: rgba(29, 78, 216, 0.1);
+            border-color: rgba(29, 78, 216, 0.3);
         }
         .user-avatar {
             margin: 0;
@@ -480,7 +480,7 @@
         .scenario-card:hover .dv-icon-tile,
         .user-card:hover .dv-icon-tile {
             transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(53, 123, 226, 0.32);
+            box-shadow: 0 14px 26px rgba(29, 78, 216, 0.32);
         }
 
         /* ========== CTA 区域 ========== */
@@ -493,7 +493,7 @@
             position: absolute;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(53, 123, 226, 0.3) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(29, 78, 216, 0.3) 0%, transparent 70%);
             filter: blur(100px);
             top: 50%;
             left: 50%;
@@ -505,18 +505,18 @@
             align-items: center;
             gap: 0.75rem;
             padding: 1.25rem 3rem;
-            background: linear-gradient(135deg, #357BE2 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
             color: white;
             font-size: 1.25rem;
             font-weight: 600;
             border-radius: 16px;
             text-decoration: none;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 32px rgba(53, 123, 226, 0.3);
+            box-shadow: 0 8px 32px rgba(29, 78, 216, 0.3);
         }
         .cta-button:hover {
             transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 16px 48px rgba(53, 123, 226, 0.4);
+            box-shadow: 0 16px 48px rgba(29, 78, 216, 0.4);
         }
         .cta-button.secondary {
             background: transparent;
@@ -595,14 +595,14 @@
             top: 0;
             left: 0;
             height: 3px;
-            background: linear-gradient(90deg, #357BE2, #6366f1);
+            background: linear-gradient(90deg, #1D4ED8, #6366f1);
             z-index: 102;
             transition: width 0.1s linear;
         }
 
         /* ========== 浅色主题覆盖（与深色同构） ========== */
         html[data-theme="light"] {
-            --intro-brand: #357be2;
+            --intro-brand: #1D4ED8;
             --intro-brand-strong: #2f62dc;
             --intro-text-strong: #0f172a;
             --intro-text-body: #334155;
@@ -648,16 +648,16 @@
             border-left-color: var(--intro-brand);
         }
         html[data-theme="light"] .solution-card {
-            background: linear-gradient(135deg, rgba(53, 123, 226, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
-            border-color: rgba(53, 123, 226, 0.22);
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
+            border-color: rgba(29, 78, 216, 0.22);
         }
         html[data-theme="light"] .solution-card:hover {
-            border-color: rgba(53, 123, 226, 0.42);
-            box-shadow: 0 20px 40px rgba(53, 123, 226, 0.14);
+            border-color: rgba(29, 78, 216, 0.42);
+            box-shadow: 0 20px 40px rgba(29, 78, 216, 0.14);
         }
         html[data-theme="light"] .dv-icon-tile {
             background: linear-gradient(135deg, #3f6fe8 0%, #5c86ff 100%);
-            box-shadow: 0 10px 22px rgba(53, 123, 226, 0.26);
+            box-shadow: 0 10px 22px rgba(29, 78, 216, 0.26);
             border-color: rgba(255, 255, 255, 0.46);
         }
         html[data-theme="light"] .dv-icon-glyph {
@@ -674,14 +674,14 @@
         html[data-theme="light"] .feature-card:hover,
         html[data-theme="light"] .scenario-card:hover,
         html[data-theme="light"] .user-card:hover {
-            border-color: rgba(53, 123, 226, 0.35);
-            box-shadow: 0 20px 44px rgba(53, 123, 226, 0.14);
+            border-color: rgba(29, 78, 216, 0.35);
+            box-shadow: 0 20px 44px rgba(29, 78, 216, 0.14);
         }
         html[data-theme="light"] .scenario-card:hover {
-            background: rgba(53, 123, 226, 0.08);
+            background: rgba(29, 78, 216, 0.08);
         }
         html[data-theme="light"] .user-card:hover {
-            background: rgba(53, 123, 226, 0.08);
+            background: rgba(29, 78, 216, 0.08);
         }
 
         html[data-theme="light"] .compare-table th {
@@ -693,7 +693,7 @@
             border-left: 1px solid rgba(148, 163, 184, 0.24);
         }
         html[data-theme="light"] .compare-table th:last-child {
-            background: linear-gradient(135deg, #357be2 0%, #4f73f3 100%);
+            background: linear-gradient(135deg, #1D4ED8 0%, #4f73f3 100%);
             color: #ffffff;
         }
         html[data-theme="light"] .compare-table td {
@@ -701,7 +701,7 @@
             color: var(--intro-text-body);
         }
         html[data-theme="light"] .compare-table tr:hover td {
-            background: rgba(53, 123, 226, 0.08);
+            background: rgba(29, 78, 216, 0.08);
         }
         html[data-theme="light"] .compare-table td:first-child {
             color: var(--intro-text-body);
@@ -727,22 +727,22 @@
             color: var(--intro-text-strong);
         }
         html[data-theme="light"] .cta-button {
-            background: linear-gradient(135deg, #2f67e8 0%, #357be2 56%, #4f79ff 100%);
-            box-shadow: 0 10px 30px rgba(53, 123, 226, 0.28);
+            background: linear-gradient(135deg, #2f67e8 0%, #1D4ED8 56%, #4f79ff 100%);
+            box-shadow: 0 10px 30px rgba(29, 78, 216, 0.28);
         }
         html[data-theme="light"] .cta-button:hover {
-            box-shadow: 0 16px 42px rgba(53, 123, 226, 0.32);
+            box-shadow: 0 16px 42px rgba(29, 78, 216, 0.32);
         }
         html[data-theme="light"] .cta-button.secondary {
             background: rgba(255, 255, 255, 0.86);
             color: var(--intro-brand-strong);
-            border-color: rgba(53, 123, 226, 0.38);
+            border-color: rgba(29, 78, 216, 0.38);
             box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
         }
         html[data-theme="light"] .cta-button.secondary:hover {
             background: rgba(255, 255, 255, 0.96);
             color: #1e3a8a;
-            border-color: rgba(53, 123, 226, 0.48);
+            border-color: rgba(29, 78, 216, 0.48);
         }
         html[data-theme="light"] .cta-button.secondary,
         html[data-theme="light"] .cta-button.secondary * {
@@ -789,14 +789,14 @@
         html[data-theme="light"] .section .text-center > p:not(.text-lg):not(.text-sm) {
             color: var(--intro-text-muted);
         }
-        html[data-theme="light"] .text-\[\#357BE2\] {
+        html[data-theme="light"] .text-\[\#1D4ED8\] {
             color: var(--intro-brand) !important;
         }
         html[data-theme="light"] .text-\[\#6366f1\] {
             color: var(--intro-brand-strong) !important;
         }
         html[data-theme="light"] .hero-title .brand-title {
-            background-image: linear-gradient(90deg, #0f172a, #1e3a8a 52%, #357be2);
+            background-image: linear-gradient(90deg, #0f172a, #1e3a8a 52%, #1D4ED8);
         }
         html[data-theme="light"] .hero-title .brand-title-cn {
             color: rgba(15, 23, 42, 0.8) !important;
@@ -808,7 +808,7 @@
             color: var(--intro-brand);
         }
         html[data-theme="light"] .cta-glow {
-            background: radial-gradient(circle, rgba(53, 123, 226, 0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(29, 78, 216, 0.2) 0%, transparent 70%);
         }
 
         /* 响应式调整 */
@@ -859,12 +859,12 @@
             <!-- Logo -->
             <div class="hero-title mb-8">
                 <svg class="logo-eye w-24 h-24 mx-auto" viewBox="0 0 96 96" fill="none">
-                    <rect x="6" y="6" width="84" height="84" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
-                    <rect x="18" y="18" width="60" height="60" rx="5" fill="#C7D2FE"/>
-                    <rect x="30" y="30" width="36" height="36" rx="4" fill="#818CF8"/>
-                    <rect x="40" y="40" width="16" height="16" rx="2" fill="#4F46E5"/>
-                    <line x1="48" y1="2" x2="48" y2="94" stroke="#818CF8" stroke-width="0.8" opacity="0.4"/>
-                    <line x1="2" y1="48" x2="94" y2="48" stroke="#818CF8" stroke-width="0.8" opacity="0.4"/>
+                    <rect x="6" y="6" width="84" height="84" rx="8" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1.5"/>
+                    <rect x="18" y="18" width="60" height="60" rx="5" fill="#93C5FD"/>
+                    <rect x="30" y="30" width="36" height="36" rx="4" fill="#1D4ED8"/>
+                    <rect x="40" y="40" width="16" height="16" rx="2" fill="#1E3A8A"/>
+                    <line x1="48" y1="2" x2="48" y2="94" stroke="#1D4ED8" stroke-width="0.8" opacity="0.4"/>
+                    <line x1="2" y1="48" x2="94" y2="48" stroke="#1D4ED8" stroke-width="0.8" opacity="0.4"/>
                 </svg>
             </div>
 
@@ -951,7 +951,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="reveal text-3xl md:text-4xl font-bold mb-4">
-                    重新定义<span class="text-[#357BE2]">"理解"</span>
+                    重新定义<span class="text-[#1D4ED8]">"理解"</span>
                 </h2>
                 <p class="reveal reveal-delay-1 text-gray-400 text-lg max-w-3xl mx-auto">
                     DeepInsight 深察，不只是一个访谈工具。<br>
@@ -961,7 +961,7 @@
             </div>
 
             <p class="reveal text-center text-xl text-gray-300 mb-10">
-                <strong class="text-[#357BE2]">核心理念：</strong>让被访谈者只需做选择，让洞察自然涌现。
+                <strong class="text-[#1D4ED8]">核心理念：</strong>让被访谈者只需做选择，让洞察自然涌现。
             </p>
 
             <div class="grid md:grid-cols-2 gap-6">
@@ -1106,7 +1106,7 @@
                     为什么选择深察？
                 </h2>
                 <p class="reveal reveal-delay-1 text-gray-400 text-lg">
-                    认知负担降低 <span class="text-[#357BE2] font-bold text-2xl">80%+</span>
+                    认知负担降低 <span class="text-[#1D4ED8] font-bold text-2xl">80%+</span>
                 </p>
             </div>
 
@@ -1155,7 +1155,7 @@
             </div>
 
             <div class="reveal mt-12 text-center">
-                <p class="text-lg text-gray-400 mb-4">从<span class="text-gray-300">"我该怎么说"</span>变成<span class="text-[#357BE2] font-semibold">"这个对不对"</span></p>
+                <p class="text-lg text-gray-400 mb-4">从<span class="text-gray-300">"我该怎么说"</span>变成<span class="text-[#1D4ED8] font-semibold">"这个对不对"</span></p>
             </div>
         </div>
 

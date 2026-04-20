@@ -1426,7 +1426,7 @@ function solutionRenderSvgFlowchart(figure) {
 
     /* rank-based accent colors — subtle, harmonious with dark theme */
     var RANK_ACCENTS = [
-        'rgba(96,213,255,0.55)',   /* rank 0: sky blue */
+        'rgba(96,165,250,0.55)',   /* rank 0: brand blue */
         'rgba(130,180,255,0.50)',  /* rank 1: periwinkle */
         'rgba(167,139,250,0.50)', /* rank 2: violet */
         'rgba(52,211,153,0.50)',  /* rank 3: emerald */
@@ -2186,7 +2186,7 @@ function solutionRenderTopbar(model, payload) {
     topbar.innerHTML = `
         <div class="solution-topbar-inner">
             <div class="solution-brand">
-                <div class="solution-brand-mark"><svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect x="3" y="3" width="34" height="34" rx="4" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/><rect x="7" y="7" width="26" height="26" rx="3" fill="#C7D2FE"/><rect x="11.5" y="11.5" width="17" height="17" rx="2.5" fill="#818CF8"/><rect x="16" y="16" width="8" height="8" rx="1.5" fill="#4F46E5"/><line x1="20" y1="1" x2="20" y2="39" stroke="#818CF8" stroke-width="0.6" opacity="0.4"/><line x1="1" y1="20" x2="39" y2="20" stroke="#818CF8" stroke-width="0.6" opacity="0.4"/></svg></div>
+                <div class="solution-brand-mark"><svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect x="3" y="3" width="34" height="34" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1"/><rect x="7" y="7" width="26" height="26" rx="3" fill="#93C5FD"/><rect x="11.5" y="11.5" width="17" height="17" rx="2.5" fill="#1D4ED8"/><rect x="16" y="16" width="8" height="8" rx="1.5" fill="#1E3A8A"/><line x1="20" y1="1" x2="20" y2="39" stroke="#1D4ED8" stroke-width="0.6" opacity="0.4"/><line x1="1" y1="20" x2="39" y2="20" stroke="#1D4ED8" stroke-width="0.6" opacity="0.4"/></svg></div>
                 <div class="solution-brand-copy">
                     <div class="solution-brand-kicker">${kicker}</div>
                     <div class="solution-brand-title">${solutionEscapeHtml(model.brandTitle)}</div>

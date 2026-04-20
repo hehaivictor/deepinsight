@@ -73,15 +73,15 @@ const SITE_CONFIG = {
     ]
   },
   "colors": {
-    "primary": "#357BE2",
+    "primary": "#1D4ED8",
     "success": "#22C55E",
-    "progressComplete": "#357BE2"
+    "progressComplete": "#1D4ED8"
   },
   "designTokens": {
     "light": {
       "colors": {
-        "brand": "#357BE2",
-        "brandHover": "#2563EB",
+        "brand": "#1D4ED8",
+        "brandHover": "#1E40AF",
         "textPrimary": "#0F172A",
         "textSecondary": "#475569",
         "textMuted": "#64748B",
@@ -96,8 +96,8 @@ const SITE_CONFIG = {
     },
     "dark": {
       "colors": {
-        "brand": "#5C98FF",
-        "brandHover": "#78B1FF",
+        "brand": "#60A5FA",
+        "brandHover": "#93C5FD",
         "textPrimary": "#E6EDF5",
         "textSecondary": "#B7C4D4",
         "textMuted": "#95A3B6",
@@ -125,7 +125,7 @@ const SITE_CONFIG = {
     "shadow": {
       "card": "0 8px 24px rgba(15, 23, 42, 0.08)",
       "modal": "0 26px 64px rgba(15, 23, 42, 0.28)",
-      "focus": "0 0 0 3px rgba(53, 123, 226, 0.2)"
+      "focus": "0 0 0 3px rgba(29, 78, 216, 0.2)"
     },
     "zIndex": {
       "dropdown": 40,
@@ -142,8 +142,8 @@ const SITE_CONFIG = {
         "label": "科技理性",
         "light": {
           "colors": {
-            "brand": "#357BE2",
-            "brandHover": "#2563EB",
+            "brand": "#1D4ED8",
+            "brandHover": "#1E40AF",
             "overlay": "rgba(15, 23, 42, 0.5)"
           },
           "shadow": {
@@ -153,8 +153,8 @@ const SITE_CONFIG = {
         },
         "dark": {
           "colors": {
-            "brand": "#5C98FF",
-            "brandHover": "#78B1FF",
+            "brand": "#60A5FA",
+            "brandHover": "#93C5FD",
             "overlay": "rgba(3, 8, 18, 0.66)"
           },
           "shadow": {
@@ -184,12 +184,12 @@ const SITE_CONFIG = {
   "a11y": {
     "minContrastAA": 4.5,
     "focusRing": {
-      "borderColorLight": "#357BE2",
-      "borderColorDark": "#5C98FF",
-      "ringColorLight": "rgba(53, 123, 226, 0.2)",
-      "ringColorDark": "rgba(92, 152, 255, 0.22)",
-      "ringStrongLight": "rgba(53, 123, 226, 0.42)",
-      "ringStrongDark": "rgba(92, 152, 255, 0.48)",
+      "borderColorLight": "#1D4ED8",
+      "borderColorDark": "#60A5FA",
+      "ringColorLight": "rgba(29, 78, 216, 0.2)",
+      "ringColorDark": "rgba(96, 165, 250, 0.22)",
+      "ringStrongLight": "rgba(29, 78, 216, 0.42)",
+      "ringStrongDark": "rgba(96, 165, 250, 0.48)",
       "underlayLight": "rgba(255, 255, 255, 0.92)",
       "underlayDark": "rgba(21, 27, 36, 0.96)"
     },

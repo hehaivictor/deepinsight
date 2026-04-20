@@ -20971,7 +20971,7 @@ flowchart LR
 ### 5. 图表配色与视觉层次（必须）
 - 禁止整张图仅使用单一颜色或同色浅深渐变，至少使用 3 种语义色。
 - flowchart/架构图必须包含 `classDef` + `class`，并按语义分层：
-  - `核心链路`：蓝色系（如 `#2563EB`）
+  - `核心链路`：蓝色系（如 `#1D4ED8`）
   - `决策节点`：橙色系（如 `#D97706`）
   - `风险/异常`：红色系（如 `#DC2626`）
   - `支撑/辅助`：绿色系（如 `#16A34A`）
@@ -20981,7 +20981,7 @@ flowchart TD
     A[核心入口] --> B{决策判断}
     B -->|通过| C[核心流程]
     B -->|阻塞| D[风险处理]
-    classDef dvCore fill:#DBEAFE,stroke:#2563EB,color:#1E3A8A,stroke-width:1.4px
+    classDef dvCore fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A,stroke-width:1.4px
     classDef dvDecision fill:#FEF3C7,stroke:#D97706,color:#7C2D12,stroke-width:1.4px
     classDef dvRisk fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.4px
     classDef dvSupport fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.4px
@@ -24844,7 +24844,7 @@ def ensure_flowchart_semantic_styles(mermaid_text: str) -> str:
             class_buckets["dvSupport"].append(node_id)
 
     style_lines = [
-        "classDef dvCore fill:#DBEAFE,stroke:#2563EB,color:#1E3A8A,stroke-width:1.4px",
+        "classDef dvCore fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A,stroke-width:1.4px",
         "classDef dvDecision fill:#FEF3C7,stroke:#D97706,color:#7C2D12,stroke-width:1.4px",
         "classDef dvRisk fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.4px",
         "classDef dvSupport fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.4px",
@@ -24921,7 +24921,7 @@ def _build_business_flow_mermaid_from_data_v3(needs: list, actions: list, risks:
     E --> G[治理 {lead_risk}]
     F --> H[结果复盘]
     G --> H
-    classDef dvCore fill:#DBEAFE,stroke:#2563EB,color:#1E3A8A,stroke-width:1.4px
+    classDef dvCore fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A,stroke-width:1.4px
     classDef dvDecision fill:#FEF3C7,stroke:#D97706,color:#7C2D12,stroke-width:1.4px
     classDef dvRisk fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.4px
     classDef dvSupport fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.4px
@@ -24979,7 +24979,7 @@ def _build_architecture_mermaid_from_data_v3(analysis: dict, actions: list, risk
     E --> H[(指标看板)]
     F --> H
     G --> H
-    classDef dvCore fill:#DBEAFE,stroke:#2563EB,color:#1E3A8A,stroke-width:1.4px
+    classDef dvCore fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A,stroke-width:1.4px
     classDef dvDecision fill:#FEF3C7,stroke:#D97706,color:#7C2D12,stroke-width:1.4px
     classDef dvRisk fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.4px
     classDef dvSupport fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.4px

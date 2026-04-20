@@ -4452,7 +4452,7 @@ function deepInsight() {
                 li { margin: 4px 0; }
                 code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
                 pre { background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; }
-                blockquote { border-left: 4px solid #3b82f6; padding-left: 16px; margin: 16px 0; color: #4b5563; }
+                blockquote { border-left: 4px solid #1D4ED8; padding-left: 16px; margin: 16px 0; color: #4b5563; }
                 table { border-collapse: collapse; width: 100%; margin: 16px 0; }
                 th, td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; }
                 th { background: #f9fafb; font-weight: 600; }
@@ -4790,7 +4790,7 @@ function deepInsight() {
                         li { margin: 4px 0; }
                         code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
                         pre { background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; }
-                        blockquote { border-left: 4px solid #3b82f6; padding-left: 16px; margin: 16px 0; color: #4b5563; }
+                        blockquote { border-left: 4px solid #1D4ED8; padding-left: 16px; margin: 16px 0; color: #4b5563; }
                         table { border-collapse: collapse; width: 100%; margin: 16px 0; }
                         th, td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; }
                         th { background: #f9fafb; font-weight: 600; }
@@ -4966,7 +4966,7 @@ function deepInsight() {
                             heading: HeadingLevel.HEADING_2,
                             spacing: { before: 360, after: 160 },
                             border: {
-                                bottom: { color: '#3B82F6', size: 6, style: BorderStyle.SINGLE }
+                                bottom: { color: '#1D4ED8', size: 6, style: BorderStyle.SINGLE }
                             }
                         }));
                     } else if (line.startsWith('# ')) {
@@ -5006,7 +5006,7 @@ function deepInsight() {
                             spacing: { before: 120, after: 120 },
                             indent: { left: 480 },
                             border: {
-                                left: { color: '#3B82F6', size: 12, style: BorderStyle.SINGLE }
+                                left: { color: '#1D4ED8', size: 12, style: BorderStyle.SINGLE }
                             }
                         }));
                     }
@@ -6595,7 +6595,7 @@ function deepInsight() {
             if (percentage >= 100) {
                 return (typeof SITE_CONFIG !== 'undefined' && SITE_CONFIG.colors?.progressComplete)
                     ? SITE_CONFIG.colors.progressComplete
-                    : '#357BE2';  // 默认鼠尾草蓝
+                    : '#1D4ED8';  // 默认品牌蓝
             }
 
             // 0-99%: 从浅灰 (#D4D4D4) 渐变到深灰 (#525252)
@@ -6617,7 +6617,7 @@ function deepInsight() {
 
         getStepClass(idx) {
             if (idx < this.currentStep || (idx === 2 && this.generatingReport)) {
-                return 'bg-[#357BE2] text-white';
+                return 'bg-[#1D4ED8] text-white';
             } else if (idx === this.currentStep) {
                 return 'bg-cta text-white';
             }

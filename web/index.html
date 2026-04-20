@@ -74,7 +74,7 @@
             }
             50% {
                 transform: scale(1.04);
-                filter: drop-shadow(0 4px 14px rgba(53, 123, 226, 0.28));
+                filter: drop-shadow(0 4px 14px rgba(29, 78, 216, 0.28));
             }
         }
         html[data-theme="light"] .logo-icon:not(.logo-searching) {
@@ -144,12 +144,12 @@
             }
         }
         .btn-sage-blue {
-            background-color: #357BE2 !important;
-            border: 1px solid #357BE2;
+            background-color: #1D4ED8 !important;
+            border: 1px solid #1D4ED8;
         }
         .btn-sage-blue:hover {
-            background-color: #2563eb !important;
-            border-color: #2563eb;
+            background-color: #1E40AF !important;
+            border-color: #1E40AF;
         }
         /* 呼吸灯动画 */
         @keyframes breathing {
@@ -171,10 +171,10 @@
         /* Logo 眼睛呼吸灯动画 - 联网搜索时（爱丽丝蓝） */
         @keyframes logo-breathing {
             0%, 100% {
-                filter: drop-shadow(0 0 0 rgba(53, 123, 226, 0));
+                filter: drop-shadow(0 0 0 rgba(29, 78, 216, 0));
             }
             50% {
-                filter: drop-shadow(0 0 12px rgba(53, 123, 226, 0.8)) drop-shadow(0 0 20px rgba(53, 123, 226, 0.4));
+                filter: drop-shadow(0 0 12px rgba(29, 78, 216, 0.8)) drop-shadow(0 0 20px rgba(29, 78, 216, 0.4));
             }
         }
         .logo-searching {
@@ -184,11 +184,11 @@
         /* 阶段进度呼吸灯动画 - 鼠尾草蓝 */
         @keyframes stage-breathing {
             0%, 100% {
-                box-shadow: 0 0 0 0 rgba(53, 123, 226, 0.7);
+                box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.7);
                 transform: scale(1);
             }
             50% {
-                box-shadow: 0 0 20px 10px rgba(53, 123, 226, 0.4);
+                box-shadow: 0 0 20px 10px rgba(29, 78, 216, 0.4);
                 transform: scale(1.1);
             }
         }
@@ -302,7 +302,7 @@
                     clusterBkg: '#F8FAFC',
                     clusterBorder: '#CBD5E1',
                     edgeLabelBackground: '#ffffff',
-                    cScale0: '#2563EB',
+                    cScale0: '#1E40AF',
                     cScale1: '#059669',
                     cScale2: '#D97706',
                     cScale3: '#DC2626',
@@ -413,7 +413,7 @@
             border-color: #93C5FD;
         }
         .markdown-body .dv-appendix-export-trigger:focus-visible {
-            outline: 2px solid #2563EB;
+            outline: 2px solid #1E40AF;
             outline-offset: 2px;
         }
         .markdown-body .dv-appendix-export-trigger-icon,
@@ -468,7 +468,7 @@
             color: #6B7280;
         }
         .markdown-body .dv-appendix-export-item-icon.is-pdf { color: #EF4444; }
-        .markdown-body .dv-appendix-export-item-icon.is-docx { color: #2563EB; }
+        .markdown-body .dv-appendix-export-item-icon.is-docx { color: #1E40AF; }
         .markdown-body .dv-appendix-export-item-copy {
             display: inline-flex;
             flex-direction: column;
@@ -609,7 +609,7 @@
         .typing-cursor {
             display: inline-block;
             animation: blink 0.8s step-end infinite;
-            color: #357BE2;
+            color: #1D4ED8;
             font-weight: normal;
         }
         @keyframes blink {
@@ -690,12 +690,12 @@
                 <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" @click="window.location.href='intro.html'" title="了解 DeepInsight">
                     <div class="relative logo-icon" :class="webSearching ? 'logo-searching' : ''">
                         <svg class="w-9 h-9" viewBox="0 0 40 40" fill="none">
-                            <rect x="3" y="3" width="34" height="34" rx="4" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1" opacity="0.3" class="logo-pulse"/>
-                            <rect x="7" y="7" width="26" height="26" rx="3" fill="#C7D2FE"/>
-                            <rect x="11.5" y="11.5" width="17" height="17" rx="2.5" fill="#818CF8"/>
-                            <rect x="16" y="16" width="8" height="8" rx="1.5" fill="#4F46E5"/>
-                            <line x1="20" y1="1" x2="20" y2="39" stroke="#818CF8" stroke-width="0.6" opacity="0.4"/>
-                            <line x1="1" y1="20" x2="39" y2="20" stroke="#818CF8" stroke-width="0.6" opacity="0.4"/>
+                            <rect x="3" y="3" width="34" height="34" rx="4" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1" opacity="0.3" class="logo-pulse"/>
+                            <rect x="7" y="7" width="26" height="26" rx="3" fill="#93C5FD"/>
+                            <rect x="11.5" y="11.5" width="17" height="17" rx="2.5" fill="#1D4ED8"/>
+                            <rect x="16" y="16" width="8" height="8" rx="1.5" fill="#1E3A8A"/>
+                            <line x1="20" y1="1" x2="20" y2="39" stroke="#1D4ED8" stroke-width="0.6" opacity="0.4"/>
+                            <line x1="1" y1="20" x2="39" y2="20" stroke="#1D4ED8" stroke-width="0.6" opacity="0.4"/>
                         </svg>
                     </div>
                     <div class="flex flex-col">
@@ -1441,7 +1441,7 @@
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center gap-2">
                                                 <template x-if="currentSession.dimensions[dimKey].coverage >= 100">
-                                                    <svg class="w-5 h-5 text-[#357BE2]" fill="currentColor" viewBox="0 0 20 20">
+                                                    <svg class="w-5 h-5 text-[#1D4ED8]" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                                     </svg>
                                                 </template>
@@ -1725,7 +1725,7 @@
                                             <!-- 阶段1: 分析回答 -->
                                             <div class="flex flex-col items-center">
                                                 <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
-                                                     :class="[thinkingStage?.stage_index >= 0 ? 'bg-[#357BE2] text-white' : 'bg-[#EDF4FE] text-[#357BE2]', thinkingStage?.stage_index === 0 ? 'stage-active' : '']">
+                                                     :class="[thinkingStage?.stage_index >= 0 ? 'bg-[#1D4ED8] text-white' : 'bg-[#EFF6FF] text-[#1D4ED8]', thinkingStage?.stage_index === 0 ? 'stage-active' : '']">
                                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                                                     </svg>
@@ -1740,7 +1740,7 @@
                                             <!-- 阶段2: 检索资料 -->
                                             <div class="flex flex-col items-center">
                                                 <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
-                                                     :class="[thinkingStage?.stage_index >= 1 ? 'bg-[#357BE2] text-white' : 'bg-[#EDF4FE] text-[#357BE2]', thinkingStage?.stage_index === 1 ? 'stage-active' : '']">
+                                                     :class="[thinkingStage?.stage_index >= 1 ? 'bg-[#1D4ED8] text-white' : 'bg-[#EFF6FF] text-[#1D4ED8]', thinkingStage?.stage_index === 1 ? 'stage-active' : '']">
                                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                                     </svg>
@@ -1755,7 +1755,7 @@
                                             <!-- 阶段3: 生成问题 -->
                                             <div class="flex flex-col items-center">
                                                 <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
-                                                     :class="[thinkingStage?.stage_index >= 2 ? 'bg-[#357BE2] text-white' : 'bg-[#EDF4FE] text-[#357BE2]', thinkingStage?.stage_index === 2 ? 'stage-active' : '']">
+                                                     :class="[thinkingStage?.stage_index >= 2 ? 'bg-[#1D4ED8] text-white' : 'bg-[#EFF6FF] text-[#1D4ED8]', thinkingStage?.stage_index === 2 ? 'stage-active' : '']">
                                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                     </svg>
@@ -1790,9 +1790,9 @@
                                             <div class="space-y-2">
                                                 <template x-for="(step, idx) in getThinkingSubSteps()" :key="idx">
                                                     <div class="flex items-center gap-2.5 text-sm transition-all duration-300"
-                                                         :class="step.done ? 'text-[#357BE2]' : 'text-gray-500'">
+                                                         :class="step.done ? 'text-[#1D4ED8]' : 'text-gray-500'">
                                                         <template x-if="step.done">
-                                                            <svg class="w-4 h-4 text-[#357BE2] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg class="w-4 h-4 text-[#1D4ED8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                             </svg>
                                                         </template>
@@ -1926,8 +1926,8 @@
 
                                     <!-- 全部完成提示 - 100%时显示 -->
                                     <div x-show="getTotalProgress() === 100" class="text-center py-8" style="display: none;">
-                                        <div class="inline-flex items-center justify-center w-16 h-16 bg-[#F0F8FF] rounded-full mb-4">
-                                            <svg class="w-8 h-8 text-[#357BE2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="inline-flex items-center justify-center w-16 h-16 bg-[#EFF6FF] rounded-full mb-4">
+                                            <svg class="w-8 h-8 text-[#1D4ED8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                             </svg>
                                     </div>
@@ -1954,7 +1954,7 @@
                                                     </template>
                                                 </div>
                                                 <button @click="aiRecommendationExpanded = !aiRecommendationExpanded"
-                                                        class="shrink-0 whitespace-nowrap text-xs text-[#357BE2] hover:text-[#2c6bd1] transition-colors">
+                                                        class="shrink-0 whitespace-nowrap text-xs text-[#1D4ED8] hover:text-[#1E40AF] transition-colors">
                                                     <span x-text="aiRecommendationExpanded ? '收起理由' : '查看理由'"></span>
                                                 </button>
                                             </div>
@@ -1971,7 +1971,7 @@
                                                     </template>
                                                 </div>
                                                 <button @click="aiRecommendationApplied ? revertAiRecommendation() : applyAiRecommendation()"
-                                                        class="inline-flex min-w-[84px] items-center justify-center shrink-0 whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-lg bg-[#357BE2] text-white hover:bg-[#2c6bd1] transition-colors">
+                                                        class="inline-flex min-w-[84px] items-center justify-center shrink-0 whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D4ED8] text-white hover:bg-[#1E40AF] transition-colors">
                                                     <span x-text="aiRecommendationApplied ? '撤回推荐' : '一键采纳'"></span>
                                                 </button>
                                             </div>
@@ -2004,18 +2004,18 @@
                                     <div class="space-y-3" x-show="getTotalProgress() < 100">
                                         <template x-for="(option, index) in currentQuestion.options" :key="index">
                                             <div @click="toggleOption(option)"
-                                                 :class="[isOptionSelected(option) ? 'border-[#EDF4FE] bg-cta/5 ring-2 ring-cta/20' : 'border-gray-200 hover:border-cta/50', isOptionRecommended(option) && !isOptionSelected(option) ? 'border-[#D6E6FF] bg-[#F7FAFF]' : '']"
+                                                 :class="[isOptionSelected(option) ? 'border-[#EFF6FF] bg-cta/5 ring-2 ring-cta/20' : 'border-gray-200 hover:border-cta/50', isOptionRecommended(option) && !isOptionSelected(option) ? 'border-[#D6E6FF] bg-[#F7FAFF]' : '']"
                                                  class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 min-h-[48px]">
                                                 <div class="flex items-center gap-3">
                                                     <!-- 单选：圆形 / 多选：方形 -->
                                                     <template x-if="!currentQuestion.multiSelect">
-                                                        <div :class="isOptionSelected(option) ? 'border-[#357BE2] bg-[#357BE2]' : 'border-gray-300'"
+                                                        <div :class="isOptionSelected(option) ? 'border-[#1D4ED8] bg-[#1D4ED8]' : 'border-gray-300'"
                                                              class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors">
                                                             <div x-show="isOptionSelected(option)" class="w-2 h-2 rounded-full bg-white"></div>
                                                         </div>
                                                     </template>
                                                     <template x-if="currentQuestion.multiSelect">
-                                                        <div :class="isOptionSelected(option) ? 'border-[#357BE2] bg-[#357BE2]' : 'border-gray-300'"
+                                                        <div :class="isOptionSelected(option) ? 'border-[#1D4ED8] bg-[#1D4ED8]' : 'border-gray-300'"
                                                              class="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors">
                                                             <svg x-show="isOptionSelected(option)" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -2031,18 +2031,18 @@
 
                                         <!-- 其他选项 - 只在有选项时显示 -->
                                              <div x-show="currentQuestion.options && currentQuestion.options.length > 0"
-                                                  :class="otherSelected ? 'border-[#EDF4FE] bg-cta/5 ring-2 ring-cta/20' : 'border-gray-200 hover:border-cta/50'"
+                                                  :class="otherSelected ? 'border-[#EFF6FF] bg-cta/5 ring-2 ring-cta/20' : 'border-gray-200 hover:border-cta/50'"
                                              class="p-4 border-2 rounded-xl transition-all duration-200 min-h-[48px]">
                                             <div :class="otherSelected ? 'mb-3' : ''" class="flex items-center gap-3 cursor-pointer" @click="toggleOther()">
                                                 <!-- 单选：圆形 / 多选：方形 -->
                                                 <template x-if="!currentQuestion.multiSelect">
-                                                    <div :class="otherSelected ? 'border-[#357BE2] bg-[#357BE2]' : 'border-gray-300'"
+                                                    <div :class="otherSelected ? 'border-[#1D4ED8] bg-[#1D4ED8]' : 'border-gray-300'"
                                                          class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors">
                                                         <div x-show="otherSelected" class="w-2 h-2 rounded-full bg-white"></div>
                                                     </div>
                                                 </template>
                                                 <template x-if="currentQuestion.multiSelect">
-                                                    <div :class="otherSelected ? 'border-[#357BE2] bg-[#357BE2]' : 'border-gray-300'"
+                                                    <div :class="otherSelected ? 'border-[#1D4ED8] bg-[#1D4ED8]' : 'border-gray-300'"
                                                          class="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors">
                                                         <svg x-show="otherSelected" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -2170,7 +2170,7 @@
                                     <template x-for="dimKey in dimensionOrder" :key="dimKey">
                                         <div class="border border-gray-200 rounded-lg p-4">
                                             <h4 class="font-semibold text-primary mb-3 flex items-center gap-2">
-                                                <span class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: #357BE2">
+                                                <span class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: #1D4ED8">
                                                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                     </svg>
@@ -4490,7 +4490,7 @@
                         <input data-guide="guide-topic" data-dialog-autofocus type="text" id="newTopic" x-model="newSessionTopic"
                                @input="onTopicInput()"
                                :placeholder="getTopicPlaceholder()"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F0F8FF] focus:border-[#F0F8FF]"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EFF6FF] focus:border-[#EFF6FF]"
                                required>
                         <p class="text-xs text-muted mt-1">简洁描述本次访谈的主题或项目名称</p>
                     </div>
@@ -4500,7 +4500,7 @@
                                   @input="onTopicInput()"
                                   :placeholder="getDescriptionPlaceholder()"
                                   rows="5"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F0F8FF] focus:border-[#F0F8FF] resize-none"></textarea>
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EFF6FF] focus:border-[#EFF6FF] resize-none"></textarea>
                         <p class="text-xs text-muted mt-1">输入详细描述可以让访谈问题更贴合您的实际需求</p>
                     </div>
 
@@ -4509,8 +4509,8 @@
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-secondary">访谈场景</label>
                             <!-- 识别中指示器 -->
-                            <div x-show="recognizing" class="flex items-center gap-1.5 text-xs text-[#357BE2]">
-                                <span class="w-1.5 h-1.5 bg-[#357BE2] rounded-full animate-pulse"></span>
+                            <div x-show="recognizing" class="flex items-center gap-1.5 text-xs text-[#1D4ED8]">
+                                <span class="w-1.5 h-1.5 bg-[#1D4ED8] rounded-full animate-pulse"></span>
                                 <span>智能识别中...</span>
                             </div>
                         </div>
@@ -4519,13 +4519,13 @@
                         <div x-show="selectedScenario" x-transition class="space-y-2">
                             <!-- 选中的场景卡片 -->
                             <div class="p-3 border-2 rounded-xl transition-all duration-200"
-                                 :class="recognizedResult?.recommended?.id === selectedScenario?.id ? 'border-[#357BE2] bg-gradient-to-r from-[#F0F8FF] to-[#EEF2FF]' : 'border-[#357BE2] bg-[#F0F8FF]'">
+                                 :class="recognizedResult?.recommended?.id === selectedScenario?.id ? 'border-[#1D4ED8] bg-gradient-to-r from-[#EFF6FF] to-[#EEF2FF]' : 'border-[#1D4ED8] bg-[#EFF6FF]'">
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2 mb-1">
                                             <!-- AI 推荐标识 -->
                                             <template x-if="recognizedResult?.recommended?.id === selectedScenario?.id">
-                                                <span class="inline-flex items-center gap-1 text-[10px] bg-[#357BE2] text-white px-1.5 py-0.5 rounded-full">
+                                                <span class="inline-flex items-center gap-1 text-[10px] bg-[#1D4ED8] text-white px-1.5 py-0.5 rounded-full">
                                                     <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                                     </svg>
@@ -4551,13 +4551,13 @@
                                         </div>
                                         <!-- AI 推荐理由 -->
                                         <template x-if="recognizedResult?.recommended?.id === selectedScenario?.id && recognizedResult?.reason">
-                                            <p class="mt-2 text-[11px] text-[#357BE2]/80 leading-relaxed border-t border-[#357BE2]/10 pt-2" x-text="recognizedResult.reason"></p>
+                                            <p class="mt-2 text-[11px] text-[#1D4ED8]/80 leading-relaxed border-t border-[#1D4ED8]/10 pt-2" x-text="recognizedResult.reason"></p>
                                         </template>
                                     </div>
                                     <!-- 换一个按钮 -->
                                     <button type="button"
                                             @click="showScenarioSelector = !showScenarioSelector"
-                                            class="flex-shrink-0 px-3 py-1.5 text-xs text-[#357BE2] hover:bg-[#357BE2]/10 rounded-lg transition-colors cursor-pointer flex items-center gap-1">
+                                            class="flex-shrink-0 px-3 py-1.5 text-xs text-[#1D4ED8] hover:bg-[#1D4ED8]/10 rounded-lg transition-colors cursor-pointer flex items-center gap-1">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                                         </svg>
@@ -4571,8 +4571,8 @@
                         <div x-show="!selectedScenario && !showScenarioSelector" x-transition>
                             <button type="button"
                                     @click="showScenarioSelector = true"
-                                    class="w-full p-3 border-2 border-dashed border-gray-300 rounded-xl text-center hover:border-[#357BE2]/50 hover:bg-[#F0F8FF]/30 transition-all cursor-pointer group">
-                                <div class="flex items-center justify-center gap-2 text-gray-500 group-hover:text-[#357BE2]">
+                                    class="w-full p-3 border-2 border-dashed border-gray-300 rounded-xl text-center hover:border-[#1D4ED8]/50 hover:bg-[#EFF6FF]/30 transition-all cursor-pointer group">
+                                <div class="flex items-center justify-center gap-2 text-gray-500 group-hover:text-[#1D4ED8]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                                     </svg>
@@ -4600,7 +4600,7 @@
                                 <input type="text"
                                        x-model="scenarioSearchQuery"
                                        placeholder="搜索场景..."
-                                       class="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2]">
+                                       class="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8]">
                             </div>
 
                             <!-- 场景列表 -->
@@ -4608,12 +4608,12 @@
                                 <!-- AI 推荐的场景 (如果有且不是当前选中) -->
                                 <template x-if="recognizedResult?.recommended && (!selectedScenario || recognizedResult.recommended.id !== selectedScenario.id)">
                                     <div class="mb-2">
-                                        <div class="text-[10px] text-[#357BE2] font-medium mb-1 px-1">AI 推荐</div>
+                                        <div class="text-[10px] text-[#1D4ED8] font-medium mb-1 px-1">AI 推荐</div>
                                         <button type="button"
                                                 @click="selectScenario(recognizedResult.recommended); showScenarioSelector = false"
-                                                class="w-full p-2 text-left rounded-lg border-2 border-[#357BE2]/30 bg-[#F0F8FF]/50 hover:bg-[#F0F8FF] transition-colors cursor-pointer">
+                                                class="w-full p-2 text-left rounded-lg border-2 border-[#1D4ED8]/30 bg-[#EFF6FF]/50 hover:bg-[#EFF6FF] transition-colors cursor-pointer">
                                             <div class="flex items-center gap-2">
-                                                <svg class="w-3.5 h-3.5 text-[#357BE2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-3.5 h-3.5 text-[#1D4ED8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                                 </svg>
                                                 <span class="text-sm font-medium text-primary" x-text="recognizedResult.recommended.name"></span>
@@ -4628,7 +4628,7 @@
                                 <template x-for="scenario in scenarios.filter(s => !s.custom && (scenarioSearchQuery === '' || s.name.includes(scenarioSearchQuery) || s.description?.includes(scenarioSearchQuery)))" :key="scenario.id">
                                     <button type="button"
                                             @click="selectScenario(scenario); showScenarioSelector = false"
-                                            :class="selectedScenario?.id === scenario.id ? 'bg-[#F0F8FF] border-[#357BE2]' : 'bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50'"
+                                            :class="selectedScenario?.id === scenario.id ? 'bg-[#EFF6FF] border-[#1D4ED8]' : 'bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50'"
                                             class="w-full p-2 text-left rounded-lg border transition-colors cursor-pointer flex items-center justify-between">
                                         <div class="flex items-center gap-2">
                                             <span class="text-sm text-primary" x-text="scenario.name"></span>
@@ -4674,8 +4674,8 @@
                             <div class="mt-3 pt-3 border-t border-gray-200">
                                 <button type="button"
                                         @click="openAiScenarioGenerator()"
-                                        class="w-full p-2 text-center rounded-lg border-2 border-dashed border-gray-300 hover:border-[#357BE2]/50 hover:bg-[#F0F8FF]/30 transition-colors cursor-pointer group">
-                                    <div class="flex items-center justify-center gap-2 text-gray-500 group-hover:text-[#357BE2]">
+                                        class="w-full p-2 text-center rounded-lg border-2 border-dashed border-gray-300 hover:border-[#1D4ED8]/50 hover:bg-[#EFF6FF]/30 transition-colors cursor-pointer group">
+                                    <div class="flex items-center justify-center gap-2 text-gray-500 group-hover:text-[#1D4ED8]">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                         </svg>
@@ -4697,7 +4697,7 @@
                             </div>
                             <button type="button"
                                     @click="generateScenarioFromInput()"
-                                    class="w-full px-3 py-2 bg-gradient-to-r from-[#357BE2] to-[#6366f1] text-white text-xs font-medium rounded-lg cursor-pointer hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5">
+                                    class="w-full px-3 py-2 bg-gradient-to-r from-[#1D4ED8] to-[#6366f1] text-white text-xs font-medium rounded-lg cursor-pointer hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                 </svg>
@@ -4710,11 +4710,11 @@
                              x-transition
                              class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 animate-spin text-[#357BE2]" fill="none" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 animate-spin text-[#1D4ED8]" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <p class="text-xs text-[#357BE2]">正在为您生成专属访谈场景...</p>
+                                <p class="text-xs text-[#1D4ED8]">正在为您生成专属访谈场景...</p>
                             </div>
                         </div>
                     </div>
@@ -4730,7 +4730,7 @@
                                         @mouseenter="hoveredDepthMode = 'quick'"
                                         @mouseleave="hoveredDepthMode = null"
                                         :class="selectedInterviewMode === 'quick'
-                                            ? 'bg-white shadow-sm text-[#357BE2]'
+                                            ? 'bg-white shadow-sm text-[#1D4ED8]'
                                             : (canUseInterviewMode('quick') ? 'text-gray-600 hover:text-gray-900' : 'text-gray-400 hover:text-gray-500 bg-gray-50/80')"
                                         class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5">
                                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4745,7 +4745,7 @@
                                         @mouseenter="hoveredDepthMode = 'standard'"
                                         @mouseleave="hoveredDepthMode = null"
                                         :class="selectedInterviewMode === 'standard'
-                                            ? 'bg-white shadow-sm text-[#357BE2]'
+                                            ? 'bg-white shadow-sm text-[#1D4ED8]'
                                             : (canUseInterviewMode('standard') ? 'text-gray-600 hover:text-gray-900' : 'text-gray-400 hover:text-gray-500 bg-gray-50/80')"
                                         class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5">
                                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4763,7 +4763,7 @@
                                         @mouseenter="hoveredDepthMode = 'deep'"
                                         @mouseleave="hoveredDepthMode = null"
                                         :class="selectedInterviewMode === 'deep'
-                                            ? 'bg-white shadow-sm text-[#357BE2]'
+                                            ? 'bg-white shadow-sm text-[#1D4ED8]'
                                             : (canUseInterviewMode('deep') ? 'text-gray-600 hover:text-gray-900' : 'text-gray-400 hover:text-gray-500 bg-gray-50/80')"
                                         class="flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5">
                                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4771,7 +4771,7 @@
                                     </svg>
                                     <span>深度</span>
                                     <span class="text-[10px] text-muted hidden sm:inline">34-52题</span>
-                                    <span x-show="canUseInterviewMode('deep')" class="text-[8px] bg-[#357BE2]/15 text-[#357BE2] px-1 py-0.5 rounded ml-0.5 hidden sm:inline">荐</span>
+                                    <span x-show="canUseInterviewMode('deep')" class="text-[8px] bg-[#1D4ED8]/15 text-[#1D4ED8] px-1 py-0.5 rounded ml-0.5 hidden sm:inline">荐</span>
                                     <span x-show="!canUseInterviewMode('deep')"
                                           class="text-[9px] bg-gray-200 text-gray-500 px-1 py-0.5 rounded hidden sm:inline"
                                           x-text="getInterviewModeRequirementLabel('deep') || '需升级'"></span>
@@ -4850,14 +4850,14 @@
                         <label class="block text-sm font-medium text-secondary mb-1">场景名称 <span class="required-asterisk">*</span></label>
                         <input type="text" id="customScenarioName" data-dialog-autofocus x-model="customScenario.name"
                                placeholder="例如：客户满意度调研"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2]">
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8]">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-secondary mb-1">场景描述</label>
                         <textarea x-model="customScenario.description"
                                   placeholder="简要描述该场景的用途..."
                                   rows="2"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2] resize-none"></textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8] resize-none"></textarea>
                     </div>
                 </div>
 
@@ -4868,8 +4868,8 @@
                         <button type="button"
                                 @click="addDimension()"
                                 :disabled="customScenario.dimensions.length >= 8"
-                                :class="customScenario.dimensions.length >= 8 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#357BE2]/10 cursor-pointer'"
-                                class="text-xs text-[#357BE2] px-2 py-1 rounded transition-colors">
+                                :class="customScenario.dimensions.length >= 8 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#1D4ED8]/10 cursor-pointer'"
+                                class="text-xs text-[#1D4ED8] px-2 py-1 rounded transition-colors">
                             + 添加维度
                         </button>
                     </div>
@@ -4888,19 +4888,19 @@
                                     <span class="text-xs text-muted w-16">维度 <span x-text="index + 1"></span></span>
                                     <input type="text" x-model="dim.name"
                                            placeholder="维度名称，如：用户体验"
-                                           class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#357BE2]/30 focus:border-[#357BE2]">
+                                           class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]/30 focus:border-[#1D4ED8]">
                                 </div>
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="text-xs text-muted w-16">维度说明</span>
                                     <input type="text" x-model="dim.description"
                                            placeholder="补充这个维度要解决什么判断"
-                                           class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#357BE2]/30 focus:border-[#357BE2]">
+                                           class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]/30 focus:border-[#1D4ED8]">
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-muted w-16">关键点</span>
                                     <input type="text" x-model="dim.key_aspects"
                                            placeholder="逗号分隔，如：易用性,响应速度"
-                                           class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#357BE2]/30 focus:border-[#357BE2]">
+                                           class="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]/30 focus:border-[#1D4ED8]">
                                 </div>
                             </div>
                         </template>
@@ -4917,19 +4917,19 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <button type="button"
                                     @click="customScenario.solution.mode = 'auto'"
-                                    :class="customScenario.solution.mode === 'auto' ? 'bg-[#357BE2] text-white border-[#357BE2]' : 'bg-white text-secondary border-gray-200 hover:border-[#357BE2]/40'"
+                                    :class="customScenario.solution.mode === 'auto' ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-secondary border-gray-200 hover:border-[#1D4ED8]/40'"
                                     class="px-3 py-2 text-sm rounded-lg border transition-colors cursor-pointer">
                                 自动推导
                             </button>
                             <button type="button"
                                     @click="customScenario.solution.mode = 'dsl'"
-                                    :class="customScenario.solution.mode === 'dsl' ? 'bg-[#357BE2] text-white border-[#357BE2]' : 'bg-white text-secondary border-gray-200 hover:border-[#357BE2]/40'"
+                                    :class="customScenario.solution.mode === 'dsl' ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-secondary border-gray-200 hover:border-[#1D4ED8]/40'"
                                     class="px-3 py-2 text-sm rounded-lg border transition-colors cursor-pointer">
                                 目录增强
                             </button>
                             <button type="button"
                                     @click="customScenario.solution.mode = 'schema'"
-                                    :class="customScenario.solution.mode === 'schema' ? 'bg-[#357BE2] text-white border-[#357BE2]' : 'bg-white text-secondary border-gray-200 hover:border-[#357BE2]/40'"
+                                    :class="customScenario.solution.mode === 'schema' ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-secondary border-gray-200 hover:border-[#1D4ED8]/40'"
                                     class="px-3 py-2 text-sm rounded-lg border transition-colors cursor-pointer">
                                 专家模式
                             </button>
@@ -4944,14 +4944,14 @@
                                     <label class="block text-xs font-medium text-muted mb-1">首屏聚焦</label>
                                     <input type="text" x-model="customScenario.solution.dsl.hero_focus"
                                            placeholder="例如：推进判断"
-                                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2]">
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-muted mb-1">强调章节</label>
                                     <textarea x-model="customScenario.solution.dsl.emphasis"
                                               rows="3"
                                               placeholder="每行一个章节，例如：&#10;风险边界&#10;下一步推进"
-                                              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2] resize-none"></textarea>
+                                              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8] resize-none"></textarea>
                                 </div>
                             </div>
                             <div>
@@ -4959,7 +4959,7 @@
                                 <textarea x-model="customScenario.solution.dsl.solution_outline"
                                           rows="4"
                                           placeholder="每行一个章节，例如：&#10;现状问题&#10;目标蓝图&#10;方案对比&#10;实施路径"
-                                          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2] resize-none"></textarea>
+                                          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8] resize-none"></textarea>
                             </div>
                         </div>
 
@@ -4968,7 +4968,7 @@
                             <textarea x-model="customScenario.solution.schemaText"
                                       rows="10"
                                       spellcheck="false"
-                                      class="w-full px-3 py-2 text-sm font-mono border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2] resize-y"></textarea>
+                                      class="w-full px-3 py-2 text-sm font-mono border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8] resize-y"></textarea>
                             <p class="text-xs text-muted mt-2">支持直接填写 `version / hero / sections`，`sections` 可以是字符串数组，也可以是完整章节对象。</p>
                         </div>
 
@@ -5043,7 +5043,7 @@
                 <div class="settings-modal-header px-5 py-4 border-b border-border flex items-center justify-between">
                     <div>
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-gradient-to-br from-[#357BE2] to-[#6366f1] rounded-lg flex items-center justify-center">
+                            <div class="w-8 h-8 bg-gradient-to-br from-[#1D4ED8] to-[#6366f1] rounded-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                 </svg>
@@ -5069,7 +5069,7 @@
                                       placeholder="例如：我想做一个餐饮行业客户满意度调研，了解顾客对菜品、服务、环境的评价&#10;&#10;或：需要对候选人进行技术能力评估，包括编程、系统设计、问题解决等方面"
                                       rows="5"
                                       :disabled="aiGenerating"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2] resize-none disabled:bg-gray-100"></textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8] resize-none disabled:bg-gray-100"></textarea>
                             <p class="text-xs text-muted mt-1.5">描述越详细，生成的场景越准确。可以包含行业、目的、关注点等。</p>
                         </div>
                     </div>
@@ -5077,7 +5077,7 @@
                     <div class="flex gap-3 justify-between mt-6 pt-4 border-t border-gray-100">
                         <button type="button"
                                 @click="openCustomScenarioEditor(); showAiGenerateModal = false"
-                                class="text-sm text-muted hover:text-[#357BE2] cursor-pointer">
+                                class="text-sm text-muted hover:text-[#1D4ED8] cursor-pointer">
                             手动创建 →
                         </button>
                         <div class="flex gap-3">
@@ -5153,20 +5153,20 @@
                         <button type="button"
                                 @click="aiExplanationExpanded = !aiExplanationExpanded"
                                 class="w-full p-3 bg-blue-50 flex items-center gap-2 cursor-pointer hover:bg-blue-100/80 transition-colors">
-                            <svg class="w-4 h-4 text-[#357BE2] transition-transform duration-200"
+                            <svg class="w-4 h-4 text-[#1D4ED8] transition-transform duration-200"
                                  :class="aiExplanationExpanded ? 'rotate-90' : ''"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
-                            <svg class="w-4 h-4 text-[#357BE2] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-[#1D4ED8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                             </svg>
-                            <span class="text-sm font-medium text-[#357BE2]">AI 设计说明</span>
+                            <span class="text-sm font-medium text-[#1D4ED8]">AI 设计说明</span>
                             <span x-show="!aiExplanationExpanded" class="text-xs text-blue-600 ml-auto">点击展开</span>
                         </button>
                         <div class="ai-explain-collapse" :class="aiExplanationExpanded ? 'ai-explain-open' : ''">
                             <div>
-                                <p class="text-sm text-[#357BE2]/90 px-3 py-2.5 bg-blue-50/50" x-text="aiExplanation"></p>
+                                <p class="text-sm text-[#1D4ED8]/90 px-3 py-2.5 bg-blue-50/50" x-text="aiExplanation"></p>
                             </div>
                         </div>
                     </div>
@@ -5179,13 +5179,13 @@
                             <div class="flex items-center gap-3">
                                 <label class="text-sm text-muted w-16 flex-shrink-0">场景名称</label>
                                 <input type="text" id="aiGeneratedScenarioName" data-dialog-autofocus x-model="aiGeneratedPreview.name"
-                                       class="flex-1 px-3 py-2 text-base font-medium bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2]">
+                                       class="flex-1 px-3 py-2 text-base font-medium bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8]">
                             </div>
                             <div class="flex items-start gap-3">
                                 <label class="text-sm text-muted w-16 flex-shrink-0 pt-2">场景描述</label>
                                 <textarea x-model="aiGeneratedPreview.description"
                                           rows="2"
-                                          class="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#357BE2]/20 focus:border-[#357BE2] resize-none"></textarea>
+                                          class="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/20 focus:border-[#1D4ED8] resize-none"></textarea>
                             </div>
                         </div>
 
@@ -5200,14 +5200,14 @@
                                 <div class="flex items-center gap-2">
                                     <button type="button"
                                             @click="expandedDimensions = expandedDimensions.length === aiGeneratedPreview.dimensions.length ? [] : aiGeneratedPreview.dimensions.map((_, i) => i)"
-                                            class="text-xs text-muted hover:text-[#357BE2] px-2 py-1 rounded transition-colors cursor-pointer">
+                                            class="text-xs text-muted hover:text-[#1D4ED8] px-2 py-1 rounded transition-colors cursor-pointer">
                                         <span x-text="expandedDimensions.length === aiGeneratedPreview.dimensions.length ? '全部收起' : '全部展开'"></span>
                                     </button>
                                     <button type="button"
                                             @click="addAiDimension()"
                                             :disabled="aiGeneratedPreview.dimensions.length >= 8"
-                                            :class="aiGeneratedPreview.dimensions.length >= 8 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#357BE2]/10 cursor-pointer'"
-                                            class="text-xs text-[#357BE2] px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                            :class="aiGeneratedPreview.dimensions.length >= 8 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#1D4ED8]/10 cursor-pointer'"
+                                            class="text-xs text-[#1D4ED8] px-2 py-1 rounded transition-colors flex items-center gap-1">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                         </svg>
@@ -5218,12 +5218,12 @@
                             <div class="space-y-2">
                                 <template x-for="(dim, index) in aiGeneratedPreview.dimensions" :key="index">
                                     <div class="border border-gray-200 rounded-lg overflow-hidden transition-shadow"
-                                         :class="expandedDimensions.includes(index) ? 'shadow-sm ring-1 ring-[#357BE2]/20' : 'hover:border-gray-300'">
+                                         :class="expandedDimensions.includes(index) ? 'shadow-sm ring-1 ring-[#1D4ED8]/20' : 'hover:border-gray-300'">
                                         <!-- 维度头部 - 始终可见 -->
                                         <div class="flex items-center gap-2 p-3 bg-white cursor-pointer"
                                              @click="toggleDimension(index)">
                                             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
-                                                 :class="expandedDimensions.includes(index) ? 'rotate-90 text-[#357BE2]' : ''"
+                                                 :class="expandedDimensions.includes(index) ? 'rotate-90 text-[#1D4ED8]' : ''"
                                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
@@ -5247,13 +5247,13 @@
                                                         <label class="text-xs text-muted w-14 flex-shrink-0">维度名称</label>
                                                         <input type="text" x-model="dim.name"
                                                                placeholder="输入维度名称"
-                                                               class="flex-1 px-2.5 py-1.5 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-[#357BE2]/30 focus:border-[#357BE2]">
+                                                               class="flex-1 px-2.5 py-1.5 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]/30 focus:border-[#1D4ED8]">
                                                     </div>
                                                     <div class="flex items-center gap-2">
                                                         <label class="text-xs text-muted w-14 flex-shrink-0">维度说明</label>
                                                         <input type="text" x-model="dim.description"
                                                                placeholder="描述这个维度的访谈目的"
-                                                               class="flex-1 px-2.5 py-1.5 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-[#357BE2]/30 focus:border-[#357BE2]">
+                                                               class="flex-1 px-2.5 py-1.5 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]/30 focus:border-[#1D4ED8]">
                                                     </div>
                                                     <div class="flex items-center gap-2">
                                                         <label class="text-xs text-muted w-14 flex-shrink-0">关键点</label>
@@ -5261,7 +5261,7 @@
                                                                :value="Array.isArray(dim.key_aspects) ? dim.key_aspects.join(', ') : dim.key_aspects"
                                                                @input="editAiDimension(index, 'key_aspects', $event.target.value)"
                                                                placeholder="用逗号分隔多个关键点"
-                                                               class="flex-1 px-2.5 py-1.5 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-[#357BE2]/30 focus:border-[#357BE2]">
+                                                               class="flex-1 px-2.5 py-1.5 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]/30 focus:border-[#1D4ED8]">
                                                     </div>
                                                 </div>
                                             </div>
@@ -5295,7 +5295,7 @@
                 <div class="flex gap-3 justify-between mt-6 pt-4 border-t border-gray-100">
                     <button type="button"
                             @click="regenerateScenario()"
-                            class="text-sm text-muted hover:text-[#357BE2] cursor-pointer flex items-center gap-1">
+                            class="text-sm text-muted hover:text-[#1D4ED8] cursor-pointer flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
