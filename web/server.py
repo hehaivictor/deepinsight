@@ -8717,8 +8717,11 @@ def resolve_effective_user_level(
     if not user_row:
         return "experience"
     resolved_license_state = license_state if isinstance(license_state, dict) else get_user_license_state(int(user_row["id"]))
-    if not bool(resolved_license_state.get("has_valid_license")):
-        return "experience"
+    if bool(resolved_license_state.get("has_valid_license")):
+        license_summary = resolved_license_state.get("license") or {}
+        return normalize_user_level_key(license_summary.get("level_key"), fallback=DEFAULT_USER_LEVEL_KEY)
+    if not bool(resolved_license_state.get("enforcement_enabled")):
+        return DEFAULT_USER_LEVEL_KEY
     license_summary = resolved_license_state.get("license") or {}
     return normalize_user_level_key(license_summary.get("level_key"), fallback="experience")
 
@@ -9119,20 +9122,52 @@ def get_license_enforcement_default_state() -> dict[str, Any]:
 
 def get_license_enforcement_state() -> dict:
     default_state = get_license_enforcement_default_state()
+    default_enabled = bool(default_state.get("enabled"))
+    override_enabled = None
+    override_present = False
+    updated_at = None
+    updated_by_user_id = None
+    try:
+        with get_license_db_connection() as conn:
+            ensure_auth_meta_table(conn)
+            raw = _read_auth_meta_value(conn, AUTH_META_LICENSE_ENFORCEMENT_ENABLED_KEY)
+            if raw:
+                override_enabled = _parse_bool_like(raw)
+                override_present = override_enabled is not None
+            at_raw = _read_auth_meta_value(conn, AUTH_META_LICENSE_ENFORCEMENT_UPDATED_AT_KEY)
+            if at_raw:
+                updated_at = at_raw
+            by_raw = _read_auth_meta_value(conn, AUTH_META_LICENSE_ENFORCEMENT_UPDATED_BY_KEY)
+            if by_raw:
+                try:
+                    updated_by_user_id = int(by_raw)
+                except (ValueError, TypeError):
+                    pass
+    except Exception:
+        pass
+    if override_present and override_enabled is not None:
+        enabled = bool(override_enabled)
+        source = "runtime_override"
+        source_label = "管理员手动设置"
+    else:
+        enabled = default_enabled
+        source = str(default_state.get("source") or "startup_default")
+        source_label = str(default_state.get("source_label") or "启动默认值")
+    message = "登录后必须绑定有效 License 才能继续使用。" if enabled else "License 验证已关闭，无需绑定即可使用。"
     return {
-        "enabled": True,
-        "default_enabled": True,
-        "default_source": "mandatory_policy",
-        "default_source_label": "系统固定要求",
+        "enabled": enabled,
+        "default_enabled": default_enabled,
+        "default_source": str(default_state.get("source") or "startup_default"),
+        "default_source_label": str(default_state.get("source_label") or "启动默认值"),
         "default_path": str(default_state.get("path") or ""),
         "default_value_in_file": bool(default_state.get("value_in_file")),
-        "override_enabled": None,
-        "override_present": False,
-        "source": "mandatory_policy",
-        "updated_at": None,
-        "updated_by_user_id": None,
-        "fixed": True,
-        "message": "登录后必须绑定有效 License 才能继续使用。",
+        "override_enabled": override_enabled,
+        "override_present": override_present,
+        "source": source,
+        "updated_at": updated_at,
+        "updated_by_user_id": updated_by_user_id,
+        "fixed": False,
+        "message": message,
     }
 
 
@@ -12543,6 +12578,8 @@ def require_admin(func):
 def require_valid_license(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        if not is_license_enforcement_enabled():
+            return func(*args, **kwargs)
         user = get_current_user()
         if not user:
             return jsonify({"error": "请先登录"}), 401
@@ -12627,7 +12664,7 @@ def enforce_auth_for_protected_routes():
     if not current_user:
         return jsonify({"error": "请先登录"}), 401
 
-    if is_license_protected_route(path):
+    if is_license_enforcement_enabled() and is_license_protected_route(path):
         license_payload = build_license_status_payload_for_user(current_user)
         if not license_payload.get("has_valid_license"):
             license_status = str(license_payload.get("status") or "missing")
@@ -43038,11 +43075,22 @@ def admin_get_license_enforcement():
 @require_admin
 @require_valid_license
 def admin_set_license_enforcement():
-    payload = get_license_enforcement_state()
+    data = request.get_json(silent=True) or {}
+    enabled = data.get("enabled")
+    if enabled is None:
+        return jsonify({"error": "缺少 enabled 参数"}), 400
+    sync_default = bool(data.get("sync_default", False))
+    user = get_current_user()
+    actor_user_id = user.get("id") if user else None
+    state = set_license_enforcement_override(
+        enabled=bool(enabled),
+        actor_user_id=actor_user_id,
+        sync_default=sync_default,
+    )
     return jsonify({
         "success": True,
-        "message": "当前版本固定要求登录后绑定有效 License，不支持关闭该规则",
-        **payload,
+        "message": "License 验证已{}".format("开启" if state.get("enabled") else "关闭"),
+        **state,
     })
 
 
@@ -43050,11 +43098,16 @@ def admin_set_license_enforcement():
 @require_admin
 @require_valid_license
 def admin_follow_license_enforcement_default():
-    payload = get_license_enforcement_state()
+    user = get_current_user()
+    actor_user_id = user.get("id") if user else None
+    state = set_license_enforcement_override(
+        enabled=None,
+        actor_user_id=actor_user_id,
+    )
     return jsonify({
         "success": True,
-        "message": "当前版本固定要求登录后绑定有效 License，无需额外恢复默认值",
-        **payload,
+        "message": "已恢复为默认值",
+        **state,
     })
 
 

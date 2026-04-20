@@ -129,7 +129,7 @@
             this.hasValidLicense = hasValidLicense;
             this.licenseStatus = status;
             this.licenseInfo = payload?.license || null;
-            this.licenseGateActive = !hasValidLicense;
+            this.licenseGateActive = enforcementEnabled && !hasValidLicense;
             this.licenseGateMessage = String(message || '').trim();
             this.applyUserLevelPayload(payload || {});
             if (!preserveInput && hasValidLicense) {
@@ -148,7 +148,7 @@
             ).trim();
             this.applyLicenseStatusPayload(
                 {
-                    enforcement_enabled: true,
+                    enforcement_enabled: payload?.enforcement_enabled ?? this.serverStatus?.license_enforcement_enabled ?? true,
                     has_valid_license: false,
                     status: licenseStatus,
                     license: payload?.license || this.licenseInfo || null
