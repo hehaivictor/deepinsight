@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "branch": "main",
+  "baseRef": "origin/main",
+  "sourceCommit": "8d49971",
+  "committedAt": "2026-04-21T09:33:47+08:00",
+  "versionType": "minor",
+  "title": "重设计双主题雷达风格品牌 Logo",
+  "changes": [
+    "重设计站点品牌 Logo，统一为雷达扫描与光核洞察视觉语言",
+    "新增浅色与深色两套 SVG 资源，支持主题切换下的独立呈现",
+    "同步更新首页、帮助页、介绍页与方案页的品牌标识引用与展示逻辑"
+  ],
+  "changedFiles": [
+    "web/favicon.svg",
+    "web/help.html",
+    "web/index.html",
+    "web/intro.html",
+    "web/logo-dark.svg",
+    "web/logo-light.svg",
+    "web/solution.html",
+    "web/solution.js"
+  ]
+}

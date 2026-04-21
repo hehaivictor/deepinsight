@@ -8,6 +8,25 @@
     <link rel="shortcut icon" href="favicon.svg">
     <title>DeepInsight 查看方案</title>
     <meta name="robots" content="noindex,nofollow,noarchive">
+    <script>
+        (function () {
+            const storageKey = 'dv-theme-mode';
+            const validModes = ['light', 'dark', 'system'];
+            let mode = 'system';
+            try {
+                const saved = localStorage.getItem(storageKey);
+                if (validModes.includes(saved)) mode = saved;
+            } catch (error) {
+                mode = 'system';
+            }
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const effective = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
+            const root = document.documentElement;
+            root.setAttribute('data-theme-mode', mode);
+            root.setAttribute('data-theme', effective);
+            root.style.colorScheme = effective;
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
