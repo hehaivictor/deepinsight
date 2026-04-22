@@ -1,7 +1,19 @@
 {
-  "version": "1.1.0",
-  "releaseDate": "2026-04-21",
+  "version": "1.1.1",
+  "releaseDate": "2026-04-22",
   "changelog": [
+    {
+      "version": "1.1.1",
+      "date": "2026-04-22",
+      "type": "patch",
+      "title": "修复 License 默认等级与 Mermaid 渲染清洗",
+      "changes": [
+        "后端：License 开关关闭时默认账号等级调整为专业版。",
+        "前端：渲染 Mermaid 前统一清洗中文弯引号，避免图表显示失败。",
+        "后端：报告渲染阶段归一化 Mermaid 语法中的弯引号。",
+        "测试：补充 License 默认等级与 Mermaid 清洗回归用例。"
+      ]
+    },
     {
       "version": "1.1.0",
       "date": "2026-04-21",
