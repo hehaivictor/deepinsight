@@ -3237,6 +3237,122 @@ class ComprehensiveApiTests(unittest.TestCase):
             self.server.select_best_refly_candidate = original_select_best_refly_candidate
             self.server.download_presentation_file = original_download_presentation_file
 
+    def test_select_primary_artifact_url_prefers_pdf_when_primary_artifact_is_image(self):
+        payload = {
+            "primary_artifact": {
+                "type": "slide_image",
+                "url": "https://example.com/slide-cover.png",
+            },
+            "artifacts": [
+                {
+                    "type": "slide_image",
+                    "url": "https://example.com/slide-01.png",
+                },
+                {
+                    "type": "slides_pdf",
+                    "url": "https://example.com/final-deck.pdf",
+                },
+            ],
+        }
+
+        self.assertEqual(
+            "https://example.com/final-deck.pdf",
+            self.server.select_primary_artifact_url(payload),
+        )
+
+    def test_select_primary_artifact_url_accepts_top_level_ppt_pdf_url(self):
+        payload = {
+            "session_id": "demo-session",
+            "ppt_url": "/outputs/demo-session/slides.pdf",
+            "slides": [
+                {"image_url": "/outputs/demo-session/slide_01.png"},
+            ],
+        }
+
+        self.assertEqual(
+            "/outputs/demo-session/slides.pdf",
+            self.server.select_primary_artifact_url(payload),
+        )
+
+    def test_select_primary_artifact_url_rejects_image_only_payload(self):
+        payload = {
+            "primary_artifact": {
+                "type": "slide_image",
+                "url": "https://example.com/slide-cover.png",
+            },
+            "artifacts": [
+                {
+                    "type": "slide_image",
+                    "url": "https://example.com/slide-01.png",
+                }
+            ],
+        }
+
+        self.assertEqual("", self.server.select_primary_artifact_url(payload))
+
+    def test_presentation_request_falls_back_to_refly_when_paper2slides_unavailable(self):
+        user = self._register()
+        professional_code = self._generate_license_batch(level_key="professional", note="演示稿 provider 回退测试")["licenses"][0]["code"]
+        self._activate_license(professional_code)
+        report_name = self._create_owned_report(int(user["id"]), topic="演示稿 provider 回退")
+
+        original_get_presentation_provider = self.server.get_presentation_provider
+        original_is_presentation_service_configured = self.server.is_presentation_service_configured
+        original_send_report_to_paper2slides_service = self.server.send_report_to_paper2slides_service
+        original_is_refly_configured = self.server.is_refly_configured
+        original_upload_refly_file = self.server.upload_refly_file
+        original_run_refly_workflow = self.server.run_refly_workflow
+        original_get_execution_owner_report = self.server.get_execution_owner_report
+        original_poll_refly_execution = self.server.poll_refly_execution
+        original_wait_for_refly_output_ready = self.server.wait_for_refly_output_ready
+        original_extract_pdf_url_from_output = self.server.extract_pdf_url_from_output
+        original_select_best_refly_candidate = self.server.select_best_refly_candidate
+        original_download_presentation_file = self.server.download_presentation_file
+        try:
+            self.server.get_presentation_provider = lambda: "paper2slides"
+            self.server.is_presentation_service_configured = lambda: True
+
+            def _raise_paper2slides_unavailable(*_args, **_kwargs):
+                raise self.server.requests.RequestException("connection refused")
+
+            self.server.send_report_to_paper2slides_service = _raise_paper2slides_unavailable
+            self.server.is_refly_configured = lambda: True
+            self.server.upload_refly_file = lambda _path: {"data": {"files": [{"key": "mock-file-key"}]}}
+            self.server.run_refly_workflow = lambda _report, file_keys=None: {"data": {"executionId": "exec-fallback"}}
+            self.server.get_execution_owner_report = lambda _execution_id: ""
+            self.server.poll_refly_execution = lambda _execution_id: {"status": "SUCCEEDED"}
+            self.server.wait_for_refly_output_ready = lambda _execution_id: {"status": "ready"}
+            self.server.extract_pdf_url_from_output = lambda _payload: "https://example.com/presentation.pdf"
+            self.server.select_best_refly_candidate = lambda _payload, _presentation_url: {
+                "url": "https://example.com/presentation.pdf",
+                "name": "presentation.pdf",
+            }
+
+            def _raise_download_failure(*_args, **_kwargs):
+                raise RuntimeError("simulated presentation download failure")
+
+            self.server.download_presentation_file = _raise_download_failure
+
+            response = self.client.post(f"/api/reports/{report_name}/refly")
+            self.assertEqual(response.status_code, 200, response.get_data(as_text=True))
+            payload = response.get_json() or {}
+            self.assertEqual("https://example.com/presentation.pdf", payload.get("pdf_url"))
+            self.assertEqual("https://example.com/presentation.pdf", payload.get("presentation_url"))
+            self.assertFalse(payload.get("processing"))
+        finally:
+            self.server.get_presentation_provider = original_get_presentation_provider
+            self.server.is_presentation_service_configured = original_is_presentation_service_configured
+            self.server.send_report_to_paper2slides_service = original_send_report_to_paper2slides_service
+            self.server.is_refly_configured = original_is_refly_configured
+            self.server.upload_refly_file = original_upload_refly_file
+            self.server.run_refly_workflow = original_run_refly_workflow
+            self.server.get_execution_owner_report = original_get_execution_owner_report
+            self.server.poll_refly_execution = original_poll_refly_execution
+            self.server.wait_for_refly_output_ready = original_wait_for_refly_output_ready
+            self.server.extract_pdf_url_from_output = original_extract_pdf_url_from_output
+            self.server.select_best_refly_candidate = original_select_best_refly_candidate
+            self.server.download_presentation_file = original_download_presentation_file
+
     def test_document_delete_by_doc_id_keeps_same_name_files(self):
         self._register()
         session_id = self._create_session(topic="文档唯一标识删除")["session_id"]
