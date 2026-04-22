@@ -421,6 +421,24 @@ SCENARIOS_DIR = ""
 DEEP_MODE_SKIP_FOLLOWUP_CONFIRM = True
 # 作用：控制演示文稿相关能力是否默认启用。
 PRESENTATION_GLOBAL_ENABLED = True
+# 作用：设置 Paper2Slides 服务地址；留空时继续使用 Refly 演示文稿链路。
+PAPER2SLIDES_API_URL = ""
+# 作用：设置 Paper2Slides 服务鉴权 token；本地无鉴权时可留空。
+PAPER2SLIDES_API_TOKEN = ""
+# 作用：设置 Paper2Slides 请求超时时间（秒）。
+PAPER2SLIDES_TIMEOUT = 30
+# 作用：设置 Paper2Slides 统一提示词 profile；未显式指定时默认使用咨询风。
+PAPER2SLIDES_PROFILE = "consulting_exec_cn"
+# 作用：设置提交给 Paper2Slides 的内容类型。
+PAPER2SLIDES_CONTENT_TYPE = "general"
+# 作用：设置 Paper2Slides 输出类型。
+PAPER2SLIDES_OUTPUT_TYPE = "slides"
+# 作用：设置 Paper2Slides 演示风格；默认使用咨询风管理汇报版式。
+PAPER2SLIDES_STYLE = "Executive consulting deck"
+# 作用：设置 Paper2Slides 幻灯片长度；默认完整表达执行摘要、MECE、根因、解法与路线图。
+PAPER2SLIDES_SLIDES_LENGTH = "long"
+# 作用：控制 Paper2Slides 是否启用 fast mode。
+PAPER2SLIDES_FAST_MODE = False
 
 # ============ 联网搜索默认值 ===========
 # 结果规模与超时留在 config，便于研发统一评估成本与时延。
@@ -461,6 +479,10 @@ MAX_IMAGE_SIZE_MB = 10
 SUPPORTED_IMAGE_TYPES = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
 
 # ============ Refly 工作流默认值 ===========
+# 作用：设置 Refly 工作流中承接主文本输入的字段名；只有工作流字段名不同于默认值时才需要在 env 覆盖。
+REFLY_INPUT_FIELD = "input"
+# 作用：设置 Refly 工作流中承接文件输入的字段名；只有工作流字段名不同于默认值时才需要在 env 覆盖。
+REFLY_FILES_FIELD = "files"
 # 作用：设置 Refly 工作流请求的超时时间（秒）。
 REFLY_TIMEOUT = 30
 # 作用：设置 Refly 工作流轮询的最长等待时间（秒）。

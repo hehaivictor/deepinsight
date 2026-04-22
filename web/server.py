@@ -43,7 +43,7 @@ from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Optional
-from urllib.parse import quote, unquote, urlparse, parse_qsl, urlencode, urlunparse
+from urllib.parse import quote, unquote, urlparse, parse_qsl, urlencode, urlunparse, urljoin
 
 from flask import Flask, Response, jsonify, request, send_from_directory, redirect, session, send_file, make_response, url_for
 from flask_cors import CORS
@@ -73,6 +73,10 @@ from web.server_modules.runtime_bootstrap import (
 from web.server_modules.object_storage_history import ObjectStorageHistoryService
 from web.server_modules.admin_config_center import AdminConfigCenterService
 from web.server_modules.ownership_admin_flow import AdminOwnershipMigrationService
+from web.server_modules.paper2slides_client import (
+    Paper2SlidesClient,
+    select_primary_artifact_url,
+)
 from web.server_modules.report_generation_runtime import (
     _classify_action_timeline_bucket_v3 as module_classify_action_timeline_bucket_v3,
     _is_action_metric_measurable_v3 as module_is_action_metric_measurable_v3,
@@ -216,9 +220,9 @@ ENV_MANAGED_CONFIG_EXACT_KEYS = {
     "OBJECT_STORAGE_REGION",
     "OBJECT_STORAGE_SECRET_ACCESS_KEY",
     "OBJECT_STORAGE_SIGNATURE_VERSION",
+    "PAPER2SLIDES_API_URL",
+    "PAPER2SLIDES_TIMEOUT",
     "REFLY_API_URL",
-    "REFLY_FILES_FIELD",
-    "REFLY_INPUT_FIELD",
     "REFLY_WORKFLOW_ID",
     "SECRET_KEY",
     "SERVER_HOST",
@@ -507,6 +511,16 @@ if REFLY_POLL_TIMEOUT < 30:
 REFLY_POLL_INTERVAL = _cfg_float("REFLY_POLL_INTERVAL", 2.0)
 if REFLY_POLL_INTERVAL <= 0:
     REFLY_POLL_INTERVAL = 2.0
+PAPER2SLIDES_API_URL = _cfg_text("PAPER2SLIDES_API_URL", "")
+PAPER2SLIDES_API_TOKEN = _cfg_text("PAPER2SLIDES_API_TOKEN", "")
+PAPER2SLIDES_TIMEOUT = _cfg_int("PAPER2SLIDES_TIMEOUT", 30)
+PAPER2SLIDES_TIMEOUT = max(1, PAPER2SLIDES_TIMEOUT)
+PAPER2SLIDES_PROFILE = _cfg_text("PAPER2SLIDES_PROFILE", "consulting_exec_cn") or "consulting_exec_cn"
+PAPER2SLIDES_CONTENT_TYPE = _cfg_text("PAPER2SLIDES_CONTENT_TYPE", "general") or "general"
+PAPER2SLIDES_OUTPUT_TYPE = _cfg_text("PAPER2SLIDES_OUTPUT_TYPE", "slides") or "slides"
+PAPER2SLIDES_STYLE = _cfg_text("PAPER2SLIDES_STYLE", "Executive consulting deck") or "Executive consulting deck"
+PAPER2SLIDES_SLIDES_LENGTH = _cfg_text("PAPER2SLIDES_SLIDES_LENGTH", "long") or "long"
+PAPER2SLIDES_FAST_MODE = _cfg_bool("PAPER2SLIDES_FAST_MODE", False)
 PRESENTATION_GLOBAL_ENABLED = _cfg_bool("PRESENTATION_GLOBAL_ENABLED", True)
 INSTANCE_SCOPE_ENFORCEMENT_ENABLED = _cfg_bool("INSTANCE_SCOPE_ENFORCEMENT_ENABLED", False)
 OBJECT_STORAGE_ENDPOINT = _cfg_text("OBJECT_STORAGE_ENDPOINT", "")
@@ -12808,7 +12822,12 @@ def get_execution_owner_report(execution_id: str) -> str:
     return find_execution_owner_in_map(data, execution_id)
 
 
-def record_presentation_file(report_filename: str, download_info: Optional[dict] = None, pdf_url: Optional[str] = None) -> Optional[dict]:
+def record_presentation_file(
+    report_filename: str,
+    download_info: Optional[dict] = None,
+    pdf_url: Optional[str] = None,
+    metadata: Optional[dict] = None,
+) -> Optional[dict]:
     report_filename = normalize_presentation_report_filename(report_filename)
     if not report_filename:
         return None
@@ -12831,6 +12850,8 @@ def record_presentation_file(report_filename: str, download_info: Optional[dict]
         })
     if pdf_url:
         record["pdf_url"] = pdf_url
+    if metadata:
+        record.update({key: value for key, value in metadata.items() if value is not None})
     if "path" not in record and "object_key" not in record and "pdf_url" not in record:
         return None
     with PRESENTATION_MAP_LOCK:
@@ -12841,7 +12862,7 @@ def record_presentation_file(report_filename: str, download_info: Optional[dict]
     return record
 
 
-def record_presentation_execution(report_filename: str, execution_id: str) -> None:
+def record_presentation_execution(report_filename: str, execution_id: str, metadata: Optional[dict] = None) -> None:
     report_filename = normalize_presentation_report_filename(report_filename)
     if not execution_id or not report_filename:
         return
@@ -12862,6 +12883,8 @@ def record_presentation_execution(report_filename: str, execution_id: str) -> No
                     print(f"⚠️ 忽略已停止任务的 execution_id 回写: execution_id={execution_id}, report={report_filename}")
                 return
             record["execution_id"] = execution_id
+            if metadata:
+                record.update({key: value for key, value in metadata.items() if value is not None})
             record.pop("stopped_at", None)
             record.pop("stopped_execution_id", None)
             if "created_at" not in record:
@@ -32022,6 +32045,30 @@ def generate_simple_report(session: dict) -> str:
 
 # ============ Refly 集成 ============
 
+def get_presentation_provider() -> str:
+    if PAPER2SLIDES_API_URL:
+        return "paper2slides"
+    return "refly"
+
+
+def is_paper2slides_configured() -> bool:
+    return bool(PAPER2SLIDES_API_URL)
+
+
+def get_paper2slides_client() -> Paper2SlidesClient:
+    return Paper2SlidesClient(
+        PAPER2SLIDES_API_URL,
+        api_token=PAPER2SLIDES_API_TOKEN,
+        timeout=PAPER2SLIDES_TIMEOUT,
+    )
+
+
+def is_presentation_service_configured() -> bool:
+    if get_presentation_provider() == "paper2slides":
+        return is_paper2slides_configured()
+    return is_refly_configured()
+
+
 def is_refly_configured() -> bool:
     return bool(REFLY_API_URL and REFLY_API_KEY and REFLY_WORKFLOW_ID and REFLY_INPUT_FIELD)
 
@@ -32135,6 +32182,150 @@ def run_refly_workflow(report_content: str, file_keys: Optional[list] = None) ->
         return response.json()
     except ValueError:
         return {"raw": response.text}
+
+
+def _paper2slides_stage_output(status_payload: dict) -> list[dict]:
+    stage_titles = {
+        "rag": "解析与索引资料",
+        "summary": "提炼内容摘要",
+        "plan": "规划演示结构",
+        "generate": "生成演示文稿",
+    }
+    stages = status_payload.get("stages") if isinstance(status_payload, dict) else {}
+    if not isinstance(stages, dict):
+        stages = {}
+
+    def normalize_status(value: object) -> str:
+        raw = str(value or "").strip().lower()
+        if raw == "completed":
+            return "finished"
+        if raw == "running":
+            return "running"
+        if raw == "failed":
+            return "failed"
+        return "pending"
+
+    output = []
+    for key, title in stage_titles.items():
+        output.append({
+            "title": title,
+            "status": normalize_status(stages.get(key)),
+        })
+    return output
+
+
+def build_paper2slides_status_payload(status_payload: dict, result_payload: Optional[dict] = None) -> dict:
+    return {
+        "data": {
+            "status": str(status_payload.get("status") or "pending"),
+            "output": _paper2slides_stage_output(status_payload),
+        },
+        "paper2slides_status": status_payload,
+        "paper2slides_result": result_payload or {},
+    }
+
+
+def send_report_to_paper2slides_service(filename: str, report_file: Path, report_content: str) -> tuple[dict, int]:
+    client = get_paper2slides_client()
+    if not client.is_configured():
+        return {"error": "Paper2Slides 服务未配置"}, 400
+
+    report_title = report_content.strip().splitlines()[0].lstrip("#").strip() if report_content else ""
+    materialized_report_file = _materialize_report_file_for_local_use(filename, report_content)
+    try:
+        create_response = client.create_presentation(
+            materialized_report_file,
+            profile=PAPER2SLIDES_PROFILE,
+            content=PAPER2SLIDES_CONTENT_TYPE,
+            output_type=PAPER2SLIDES_OUTPUT_TYPE,
+            style=PAPER2SLIDES_STYLE,
+            style_prompt="",
+            length=PAPER2SLIDES_SLIDES_LENGTH,
+            fast_mode=PAPER2SLIDES_FAST_MODE,
+        )
+    finally:
+        if materialized_report_file != report_file:
+            materialized_report_file.unlink(missing_ok=True)
+
+    job_id = str(create_response.get("job_id") or "").strip()
+    if not job_id:
+        return {
+            "error": "Paper2Slides 服务未返回 job_id",
+            "paper2slides_response": create_response,
+        }, 502
+
+    owner = get_execution_owner_report(job_id)
+    if owner and owner != filename:
+        return {
+            "error": "生成任务归属冲突，请重试",
+            "mismatch": True,
+            "owner_report": owner,
+            "execution_id": job_id,
+        }, 409
+
+    record_presentation_execution(filename, job_id, metadata={
+        "provider": "paper2slides",
+        "paper2slides_job_id": job_id,
+    })
+
+    return {
+        "message": "已提交生成任务",
+        "report_filename": filename,
+        "report_title": report_title,
+        "execution_id": job_id,
+        "paper2slides_response": create_response,
+        "processing": True,
+    }, 202
+
+
+def check_paper2slides_status(filename: str, execution_id: str) -> tuple[dict, int]:
+    client = get_paper2slides_client()
+    status_payload = client.get_status(execution_id)
+    result_payload, ready = client.get_result(execution_id)
+
+    if not ready:
+        record_presentation_execution(filename, execution_id, metadata={
+            "provider": "paper2slides",
+            "paper2slides_job_id": execution_id,
+        })
+        return {
+            "processing": True,
+            "execution_id": execution_id,
+            "refly_status": build_paper2slides_status_payload(status_payload, result_payload),
+            "refly_response": build_paper2slides_status_payload(status_payload, result_payload),
+            "paper2slides_status": status_payload,
+            "paper2slides_result": result_payload or {},
+        }, 200
+
+    pdf_url = select_primary_artifact_url(result_payload or {})
+    if not pdf_url:
+        return {
+            "processing": False,
+            "execution_id": execution_id,
+            "error": "Paper2Slides 未返回可用演示文稿产物",
+            "paper2slides_status": status_payload,
+            "paper2slides_result": result_payload or {},
+        }, 502
+    if pdf_url.startswith("/"):
+        pdf_url = urljoin(f"{PAPER2SLIDES_API_URL.rstrip('/')}/", pdf_url.lstrip("/"))
+
+    record_presentation_file(
+        filename,
+        None,
+        pdf_url=pdf_url,
+        metadata={
+            "provider": "paper2slides",
+            "paper2slides_job_id": execution_id,
+        },
+    )
+    return {
+        "execution_id": execution_id,
+        "pdf_url": pdf_url,
+        "refly_status": build_paper2slides_status_payload(status_payload, result_payload),
+        "refly_response": build_paper2slides_status_payload(status_payload, result_payload),
+        "paper2slides_status": status_payload,
+        "paper2slides_result": result_payload or {},
+    }, 200
 
 
 def poll_refly_execution(execution_id: str) -> dict:
@@ -42455,7 +42646,7 @@ def send_report_to_refly(filename):
         response, status_code = owner_error
         return response, status_code
 
-    if not is_refly_configured():
+    if not is_presentation_service_configured():
         return jsonify({"error": "演示文稿服务未配置"}), 400
 
     clear_presentation_stopped(filename)
@@ -42463,6 +42654,16 @@ def send_report_to_refly(filename):
 
     try:
         report_content = _load_report_content(filename)
+        if get_presentation_provider() == "paper2slides":
+            try:
+                payload, status_code = send_report_to_paper2slides_service(filename, report_file, report_content)
+                return jsonify(payload), status_code
+            except requests.RequestException as exc:
+                if ENABLE_DEBUG_LOG:
+                    print(f"⚠️ Paper2Slides 服务请求异常，准备回退 Refly: {exc}")
+                if not is_refly_configured():
+                    return jsonify({"error": "Paper2Slides 服务不可用，且 Refly 未配置"}), 502
+
         report_title = report_content.strip().splitlines()[0].lstrip("#").strip() if report_content else ""
         materialized_report_file = _materialize_report_file_for_local_use(filename, report_content)
         try:
@@ -42589,6 +42790,8 @@ def send_report_to_refly(filename):
             print(f"⚠️ 演示文稿服务 HTTP 错误: {detail}")
         return jsonify({"error": "演示文稿服务请求失败"}), 502
     except requests.exceptions.Timeout:
+        if not execution_id:
+            return jsonify({"error": "演示文稿服务超时，请稍后重试"}), 504
         stopped = is_presentation_execution_stopped(filename, execution_id)
         if execution_id and not stopped:
             record_presentation_execution(filename, execution_id)
@@ -42599,6 +42802,8 @@ def send_report_to_refly(filename):
             "message": "演示文稿生成已停止" if stopped else "演示文稿仍在生成中，请稍后重试"
         }), 202
     except requests.exceptions.SSLError:
+        if not execution_id:
+            return jsonify({"error": "演示文稿服务证书校验失败"}), 502
         stopped = is_presentation_execution_stopped(filename, execution_id)
         if execution_id and not stopped:
             record_presentation_execution(filename, execution_id)
@@ -42611,6 +42816,8 @@ def send_report_to_refly(filename):
     except requests.RequestException as exc:
         if ENABLE_DEBUG_LOG:
             print(f"⚠️ 演示文稿服务请求异常: {exc}")
+        if not execution_id:
+            return jsonify({"error": "演示文稿服务不可用，请稍后重试"}), 502
         stopped = is_presentation_execution_stopped(filename, execution_id)
         if execution_id and not stopped:
             record_presentation_execution(filename, execution_id)
@@ -42671,6 +42878,28 @@ def check_refly_status(filename):
             "owner_report": owner,
             "message": "execution_id 与报告不匹配"
         }), 409
+    if str(current_record.get("provider") or "").strip() == "paper2slides":
+        try:
+            payload, status_code = check_paper2slides_status(filename, execution_id)
+            return jsonify(payload), status_code
+        except requests.exceptions.Timeout:
+            stopped = is_presentation_execution_stopped(filename, execution_id)
+            return jsonify({
+                "processing": not stopped,
+                "execution_id": "" if stopped else execution_id,
+                "stopped": stopped,
+                "message": "演示文稿生成已停止" if stopped else "演示文稿仍在生成中，请稍后重试"
+            })
+        except requests.RequestException as exc:
+            if ENABLE_DEBUG_LOG:
+                print(f"⚠️ Paper2Slides 服务请求异常: {exc}")
+            stopped = is_presentation_execution_stopped(filename, execution_id)
+            return jsonify({
+                "processing": not stopped,
+                "execution_id": "" if stopped else execution_id,
+                "stopped": stopped,
+                "message": "演示文稿生成已停止" if stopped else "演示文稿仍在生成中，请稍后重试"
+            })
     try:
         status_response = fetch_refly_status_once(execution_id)
         output_response = fetch_refly_output(execution_id)
@@ -42761,6 +42990,16 @@ def abort_report_presentation(filename):
         mark_presentation_stopped(filename)
         return jsonify({"success": True, "execution_id": ""})
     try:
+        record = get_presentation_record(filename) or {}
+        if str(record.get("provider") or "").strip() == "paper2slides":
+            try:
+                get_paper2slides_client().cancel(execution_id)
+            except requests.RequestException as exc:
+                if ENABLE_DEBUG_LOG:
+                    print(f"⚠️ Paper2Slides 中止失败: {exc}")
+            mark_presentation_stopped(filename, execution_id=execution_id)
+            return jsonify({"success": True, "execution_id": execution_id})
+
         url = get_refly_abort_url(execution_id)
         headers = {"Authorization": f"Bearer {REFLY_API_KEY}"}
         response = requests.post(url, headers=headers, timeout=REFLY_TIMEOUT)
