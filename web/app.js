@@ -5366,6 +5366,13 @@ function deepInsight() {
             );
         },
 
+        normalizeMermaidDefinition(definition) {
+            return String(definition || '')
+                .replace(/[“”]/g, '"')
+                .replace(/[‘’]/g, "'")
+                .trim();
+        },
+
         // 渲染页面中的所有 Mermaid 图表
         async renderMermaidCharts() {
             if (typeof mermaid === 'undefined') {
@@ -5395,7 +5402,7 @@ function deepInsight() {
                     }
 
                     try {
-                        const graphDefinition = (element.dataset.mermaidDefinition || element.textContent || '').trim();
+                        const graphDefinition = this.normalizeMermaidDefinition(element.dataset.mermaidDefinition || element.textContent || '');
                         if (!graphDefinition) continue;
                         element.dataset.mermaidDefinition = graphDefinition;
                         const id = `mermaid-${Date.now()}-${i}`;

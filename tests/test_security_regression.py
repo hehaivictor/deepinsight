@@ -4776,6 +4776,33 @@ class SecurityRegressionTests(unittest.TestCase):
         finally:
             self.server.REPORT_V3_RENDER_MERMAID_FROM_DATA = old_flag
 
+    def test_render_report_from_draft_v3_normalizes_model_mermaid_quotes(self):
+        old_flag = self.server.REPORT_V3_RENDER_MERMAID_FROM_DATA
+        try:
+            self.server.REPORT_V3_RENDER_MERMAID_FROM_DATA = False
+            draft = {
+                "overview": "验证模型输出 Mermaid 清洗。",
+                "needs": [{"name": "效率提升", "priority": "P0", "description": "缩短处理时间"}],
+                "analysis": {
+                    "customer_needs": "需要提升效率。",
+                    "business_flow": "当前流程依赖人工。",
+                    "tech_constraints": "需要兼容现有系统。",
+                    "project_constraints": "分阶段上线。",
+                },
+                "visualizations": {
+                    "priority_quadrant_mermaid": "quadrantChart\n    “效率提升”: [0.8, 0.9]",
+                    "demand_pie_mermaid": "pie title 需求分布\n    “效率与质量” : 45",
+                },
+            }
+
+            report = self.server.render_report_from_draft_v3({"topic": "Mermaid 清洗"}, draft, {})
+
+            self.assertNotIn("“效率", report)
+            self.assertIn('"效率提升": [0.8, 0.9]', report)
+            self.assertIn('"效率与质量" : 45', report)
+        finally:
+            self.server.REPORT_V3_RENDER_MERMAID_FROM_DATA = old_flag
+
     def test_render_report_from_draft_v3_dispatches_assessment_and_custom_template(self):
         backup_assessment = self.server.render_report_from_draft_assessment_v1
         backup_custom = self.server.render_report_from_draft_custom_v1

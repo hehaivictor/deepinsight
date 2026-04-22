@@ -518,23 +518,24 @@ class ComprehensiveApiTests(unittest.TestCase):
         me_resp = self.client.get("/api/auth/me")
         self.assertEqual(me_resp.status_code, 200, me_resp.get_data(as_text=True))
         me_payload = me_resp.get_json() or {}
-        self.assertEqual("standard", (me_payload.get("level") or {}).get("key"))
-        self.assertEqual(["balanced"], me_payload.get("allowed_report_profiles"))
+        self.assertEqual("professional", (me_payload.get("level") or {}).get("key"))
+        self.assertEqual(["balanced", "quality"], me_payload.get("allowed_report_profiles"))
         self.assertEqual("balanced", me_payload.get("report_profile_default"))
-        self.assertEqual(["quick", "standard"], me_payload.get("allowed_interview_modes"))
-        self.assertEqual("standard", me_payload.get("interview_mode_default"))
+        self.assertEqual(["quick", "standard", "deep"], me_payload.get("allowed_interview_modes"))
+        self.assertEqual("deep", me_payload.get("interview_mode_default"))
         self.assertEqual("standard", ((me_payload.get("interview_mode_requirements") or {}).get("standard") or {}).get("key"))
         self.assertEqual("professional", ((me_payload.get("interview_mode_requirements") or {}).get("deep") or {}).get("key"))
         self.assertTrue((me_payload.get("capabilities") or {}).get("report.export.basic"))
+        self.assertTrue((me_payload.get("capabilities") or {}).get("report.profile.quality"))
 
         status_resp = self.client.get("/api/status")
         self.assertEqual(status_resp.status_code, 200, status_resp.get_data(as_text=True))
         status_payload = status_resp.get_json() or {}
-        self.assertEqual("standard", (status_payload.get("level") or {}).get("key"))
-        self.assertEqual(["balanced"], status_payload.get("allowed_report_profiles"))
-        self.assertEqual(["balanced"], status_payload.get("report_profile_options"))
-        self.assertEqual(["quick", "standard"], status_payload.get("allowed_interview_modes"))
-        self.assertEqual("standard", status_payload.get("interview_mode_default"))
+        self.assertEqual("professional", (status_payload.get("level") or {}).get("key"))
+        self.assertEqual(["balanced", "quality"], status_payload.get("allowed_report_profiles"))
+        self.assertEqual(["balanced", "quality"], status_payload.get("report_profile_options"))
+        self.assertEqual(["quick", "standard", "deep"], status_payload.get("allowed_interview_modes"))
+        self.assertEqual("deep", status_payload.get("interview_mode_default"))
 
     def test_auth_and_status_keep_experience_level_when_license_enforcement_enabled(self):
         self.server.LICENSE_ENFORCEMENT_ENABLED = True
@@ -606,6 +607,8 @@ class ComprehensiveApiTests(unittest.TestCase):
             self.server.SMS_LOGIN_ENABLED = old_enabled
 
     def test_experience_user_cannot_create_standard_or_deep_session(self):
+        self.server.LICENSE_ENFORCEMENT_ENABLED = True
+        self.server.set_license_enforcement_override(True)
         self._register()
         original_is_license_protected_route = self.server.is_license_protected_route
         try:
@@ -619,7 +622,7 @@ class ComprehensiveApiTests(unittest.TestCase):
             standard_payload = standard_resp.get_json() or {}
             self.assertEqual("level_capability_denied", standard_payload.get("error_code"))
             self.assertEqual("interview.mode.standard", standard_payload.get("capability_key"))
-            self.assertEqual("standard", (standard_payload.get("current_level") or {}).get("key"))
+            self.assertEqual("experience", (standard_payload.get("current_level") or {}).get("key"))
             self.assertEqual("standard", (standard_payload.get("required_level") or {}).get("key"))
 
             deep_resp = self.client.post(
@@ -630,6 +633,7 @@ class ComprehensiveApiTests(unittest.TestCase):
             deep_payload = deep_resp.get_json() or {}
             self.assertEqual("level_capability_denied", deep_payload.get("error_code"))
             self.assertEqual("interview.mode.deep", deep_payload.get("capability_key"))
+            self.assertEqual("experience", (deep_payload.get("current_level") or {}).get("key"))
             self.assertEqual("professional", (deep_payload.get("required_level") or {}).get("key"))
         finally:
             self.server.is_license_protected_route = original_is_license_protected_route
@@ -4822,6 +4826,8 @@ class ComprehensiveApiTests(unittest.TestCase):
             self.server.report_generation_executor.submit = original_submit
 
     def test_experience_user_cannot_request_quality_report(self):
+        self.server.LICENSE_ENFORCEMENT_ENABLED = True
+        self.server.set_license_enforcement_override(True)
         self._register()
         original_is_license_protected_route = self.server.is_license_protected_route
         try:
@@ -4839,7 +4845,7 @@ class ComprehensiveApiTests(unittest.TestCase):
             payload = response.get_json() or {}
             self.assertEqual("level_capability_denied", payload.get("error_code"))
             self.assertEqual("report.profile.quality", payload.get("capability_key"))
-            self.assertEqual("standard", (payload.get("current_level") or {}).get("key"))
+            self.assertEqual("experience", (payload.get("current_level") or {}).get("key"))
             self.assertEqual("professional", (payload.get("required_level") or {}).get("key"))
         finally:
             self.server.is_license_protected_route = original_is_license_protected_route

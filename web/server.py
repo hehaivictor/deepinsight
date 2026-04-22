@@ -8721,7 +8721,7 @@ def resolve_effective_user_level(
         license_summary = resolved_license_state.get("license") or {}
         return normalize_user_level_key(license_summary.get("level_key"), fallback=DEFAULT_USER_LEVEL_KEY)
     if not bool(resolved_license_state.get("enforcement_enabled")):
-        return DEFAULT_USER_LEVEL_KEY
+        return "professional"
     license_summary = resolved_license_state.get("license") or {}
     return normalize_user_level_key(license_summary.get("level_key"), fallback="experience")
 
@@ -25074,6 +25074,19 @@ def _build_priority_matrix_mermaid_for_custom_v3(needs: list) -> str:
     return "\n".join(lines)
 
 
+def normalize_mermaid_syntax_v3(raw_value: object) -> str:
+    """归一化模型输出中的常见 Mermaid 语法噪声。"""
+    value = str(raw_value or "").replace("```mermaid", "").replace("```", "").strip()
+    if not value:
+        return ""
+    return value.translate(str.maketrans({
+        "“": '"',
+        "”": '"',
+        "‘": "'",
+        "’": "'",
+    })).strip()
+
+
 def _render_priority_table_from_needs_v3(needs: list) -> list[str]:
     groups = {"P0": [], "P1": [], "P2": [], "P3": []}
     for item in needs if isinstance(needs, list) else []:
@@ -25326,6 +25339,7 @@ def render_report_from_draft_custom_v1(session: dict, draft: dict, quality_meta:
             else:
                 mermaid_value = str(resolve_custom_report_source_value_v3(draft, source) or "").strip()
             mermaid_value = mermaid_value or generated_visuals.get("visualizations.business_flow_mermaid", "")
+            mermaid_value = normalize_mermaid_syntax_v3(mermaid_value)
             if source in {"visualizations.business_flow_mermaid", "visualizations.architecture_mermaid"}:
                 mermaid_value = ensure_flowchart_semantic_styles(mermaid_value)
             lines.append("```mermaid")
@@ -25530,7 +25544,7 @@ def render_report_from_draft_v3(session: dict, draft: dict, quality_meta: dict) 
     visuals = draft.get("visualizations", {}) if isinstance(draft.get("visualizations", {}), dict) else {}
 
     def clean_mermaid(raw_value: str, fallback: str) -> str:
-        value = str(raw_value or "").replace("```mermaid", "").replace("```", "").strip()
+        value = normalize_mermaid_syntax_v3(raw_value)
         return value or fallback
 
     def clamp_score(value: float) -> float:

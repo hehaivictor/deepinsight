@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "branch": "main",
+  "baseRef": "origin/main",
+  "sourceCommit": "8581f31",
+  "committedAt": "2026-04-22T14:56:58+08:00",
+  "versionType": "patch",
+  "title": "修复 License 默认等级与 Mermaid 渲染清洗",
+  "changes": [
+    "后端：License 开关关闭时默认账号等级调整为专业版。",
+    "前端：渲染 Mermaid 前统一清洗中文弯引号，避免图表显示失败。",
+    "后端：报告渲染阶段归一化 Mermaid 语法中的弯引号。",
+    "测试：补充 License 默认等级与 Mermaid 清洗回归用例。"
+  ],
+  "changedFiles": [
+    "tests/test_api_comprehensive.py",
+    "tests/test_security_regression.py",
+    "web/app.js",
+    "web/server.py"
+  ]
+}
