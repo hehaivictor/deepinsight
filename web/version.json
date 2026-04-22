@@ -1,7 +1,19 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "releaseDate": "2026-04-22",
   "changelog": [
+    {
+      "version": "1.2.0",
+      "date": "2026-04-22",
+      "type": "minor",
+      "title": "同步 Paper2Slides profile 默认配置",
+      "changes": [
+        "配置：新增 PAPER2SLIDES_PROFILE 默认值，并在运行时配置中保持咨询风主流程。",
+        "集成：调用 Paper2Slides 服务时透传 profile 参数，统一上下游风格入口。",
+        "客户端：扩展 paper2slides_client 请求载荷，支持 profile 字段。",
+        "文档：更新 .env.example 说明，补齐演示文稿服务默认参数。"
+      ]
+    },
     {
       "version": "1.1.1",
       "date": "2026-04-22",
