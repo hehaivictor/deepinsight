@@ -3290,24 +3290,15 @@ class ComprehensiveApiTests(unittest.TestCase):
 
         self.assertEqual("", self.server.select_primary_artifact_url(payload))
 
-    def test_presentation_request_falls_back_to_refly_when_paper2slides_unavailable(self):
+    def test_presentation_request_returns_502_when_paper2slides_unavailable(self):
         user = self._register()
-        professional_code = self._generate_license_batch(level_key="professional", note="演示稿 provider 回退测试")["licenses"][0]["code"]
+        professional_code = self._generate_license_batch(level_key="professional", note="演示稿 provider 不降级测试")["licenses"][0]["code"]
         self._activate_license(professional_code)
-        report_name = self._create_owned_report(int(user["id"]), topic="演示稿 provider 回退")
+        report_name = self._create_owned_report(int(user["id"]), topic="演示稿 provider 不降级")
 
         original_get_presentation_provider = self.server.get_presentation_provider
         original_is_presentation_service_configured = self.server.is_presentation_service_configured
         original_send_report_to_paper2slides_service = self.server.send_report_to_paper2slides_service
-        original_is_refly_configured = self.server.is_refly_configured
-        original_upload_refly_file = self.server.upload_refly_file
-        original_run_refly_workflow = self.server.run_refly_workflow
-        original_get_execution_owner_report = self.server.get_execution_owner_report
-        original_poll_refly_execution = self.server.poll_refly_execution
-        original_wait_for_refly_output_ready = self.server.wait_for_refly_output_ready
-        original_extract_pdf_url_from_output = self.server.extract_pdf_url_from_output
-        original_select_best_refly_candidate = self.server.select_best_refly_candidate
-        original_download_presentation_file = self.server.download_presentation_file
         try:
             self.server.get_presentation_provider = lambda: "paper2slides"
             self.server.is_presentation_service_configured = lambda: True
@@ -3316,42 +3307,76 @@ class ComprehensiveApiTests(unittest.TestCase):
                 raise self.server.requests.RequestException("connection refused")
 
             self.server.send_report_to_paper2slides_service = _raise_paper2slides_unavailable
-            self.server.is_refly_configured = lambda: True
-            self.server.upload_refly_file = lambda _path: {"data": {"files": [{"key": "mock-file-key"}]}}
-            self.server.run_refly_workflow = lambda _report, file_keys=None: {"data": {"executionId": "exec-fallback"}}
-            self.server.get_execution_owner_report = lambda _execution_id: ""
-            self.server.poll_refly_execution = lambda _execution_id: {"status": "SUCCEEDED"}
-            self.server.wait_for_refly_output_ready = lambda _execution_id: {"status": "ready"}
-            self.server.extract_pdf_url_from_output = lambda _payload: "https://example.com/presentation.pdf"
-            self.server.select_best_refly_candidate = lambda _payload, _presentation_url: {
-                "url": "https://example.com/presentation.pdf",
-                "name": "presentation.pdf",
-            }
-
-            def _raise_download_failure(*_args, **_kwargs):
-                raise RuntimeError("simulated presentation download failure")
-
-            self.server.download_presentation_file = _raise_download_failure
 
             response = self.client.post(f"/api/reports/{report_name}/refly")
-            self.assertEqual(response.status_code, 200, response.get_data(as_text=True))
+            self.assertEqual(response.status_code, 502, response.get_data(as_text=True))
             payload = response.get_json() or {}
-            self.assertEqual("https://example.com/presentation.pdf", payload.get("pdf_url"))
-            self.assertEqual("https://example.com/presentation.pdf", payload.get("presentation_url"))
-            self.assertFalse(payload.get("processing"))
+            self.assertEqual("演示文稿服务不可用，请稍后重试", payload.get("error"))
         finally:
             self.server.get_presentation_provider = original_get_presentation_provider
             self.server.is_presentation_service_configured = original_is_presentation_service_configured
             self.server.send_report_to_paper2slides_service = original_send_report_to_paper2slides_service
-            self.server.is_refly_configured = original_is_refly_configured
-            self.server.upload_refly_file = original_upload_refly_file
-            self.server.run_refly_workflow = original_run_refly_workflow
-            self.server.get_execution_owner_report = original_get_execution_owner_report
-            self.server.poll_refly_execution = original_poll_refly_execution
-            self.server.wait_for_refly_output_ready = original_wait_for_refly_output_ready
-            self.server.extract_pdf_url_from_output = original_extract_pdf_url_from_output
-            self.server.select_best_refly_candidate = original_select_best_refly_candidate
-            self.server.download_presentation_file = original_download_presentation_file
+
+    def test_paper2slides_failed_status_returns_explicit_failure_message(self):
+        user = self._register()
+        professional_code = self._generate_license_batch(level_key="professional", note="Paper2Slides 失败提示测试")["licenses"][0]["code"]
+        self._activate_license(professional_code)
+        report_name = self._create_owned_report(int(user["id"]), topic="演示稿额度耗尽失败")
+        execution_id = "exec-paper2slides-failed"
+
+        original_get_paper2slides_client = self.server.get_paper2slides_client
+        try:
+            self.server.record_presentation_execution(
+                report_name,
+                execution_id,
+                metadata={
+                    "provider": "paper2slides",
+                    "paper2slides_job_id": execution_id,
+                },
+            )
+
+            class _MockPaper2SlidesClient:
+                def get_status(self, job_id):
+                    return {
+                        "session_id": job_id,
+                        "status": "failed",
+                        "stages": {
+                            "rag": "completed",
+                            "summary": "completed",
+                            "plan": "completed",
+                            "generate": "failed",
+                        },
+                        "error": "Error code: 402 - {'error': {'message': \"You've used up your points!\", 'type': 'insufficient_quota', 'code': 'insufficient_quota'}}",
+                    }
+
+                def get_result(self, job_id):
+                    return ({
+                        "job_id": job_id,
+                        "status": "completed",
+                        "num_files": 0,
+                        "primary_artifact": None,
+                        "artifacts": [],
+                    }, True)
+
+            self.server.get_paper2slides_client = lambda: _MockPaper2SlidesClient()
+
+            response = self.client.get(
+                f"/api/reports/{report_name}/refly/status?execution_id={execution_id}"
+            )
+            self.assertEqual(response.status_code, 502, response.get_data(as_text=True))
+            payload = response.get_json() or {}
+            self.assertFalse(payload.get("processing"))
+            self.assertTrue(payload.get("failed"))
+            self.assertEqual("paper2slides_insufficient_quota", payload.get("error_code"))
+            self.assertIn("模型额度不足", payload.get("error", ""))
+            self.assertIn("insufficient_quota", payload.get("paper2slides_error", ""))
+
+            record = self.server.get_presentation_record(report_name) or {}
+            self.assertFalse(record.get("execution_id"))
+            self.assertEqual("paper2slides", record.get("provider"))
+            self.assertIn("insufficient_quota", str(record.get("last_error") or ""))
+        finally:
+            self.server.get_paper2slides_client = original_get_paper2slides_client
 
     def test_document_delete_by_doc_id_keeps_same_name_files(self):
         self._register()

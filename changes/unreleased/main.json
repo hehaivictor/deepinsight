@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "branch": "main",
+  "baseRef": "origin/main",
+  "sourceCommit": "b00c77b",
+  "committedAt": "2026-04-22T19:04:27+08:00",
+  "versionType": "major",
+  "title": "修复演示文稿生成链路异常处理",
+  "changes": [
+    "后端调整 Paper2Slides 异常处理与失败态返回，移除失败后自动降级 Refly 的逻辑",
+    "前端在演示文稿轮询中识别不可重试失败，停止轮询并展示明确错误提示",
+    "测试补充 Paper2Slides 产物识别、服务不可用与额度不足场景回归"
+  ],
+  "changedFiles": [
+    "tests/test_api_comprehensive.py",
+    "web/app_modules/report_detail_runtime.js",
+    "web/server.py"
+  ]
+}

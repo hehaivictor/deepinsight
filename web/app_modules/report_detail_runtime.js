@@ -1134,6 +1134,54 @@
             return `正在生成演示文稿...${this.getPresentationGenerationButtonProgressText()}（点击停止）`;
         },
 
+        isRetriablePresentationPollingError(error) {
+            const payload = error?.payload && typeof error.payload === 'object' ? error.payload : {};
+            const errorCode = String(payload.error_code || '').trim().toLowerCase();
+            if (errorCode === 'paper2slides_generation_failed' || errorCode === 'paper2slides_insufficient_quota') {
+                return false;
+            }
+
+            const status = Number(error?.status || 0);
+            const message = String(payload.error || payload.detail || error?.message || '').trim().toLowerCase();
+            if (!message && !status) return true;
+
+            return (
+                message.includes('failed to fetch')
+                || message.includes('networkerror')
+                || message.includes('load failed')
+                || status === 408
+                || status === 429
+                || status === 502
+                || status === 503
+                || status === 504
+            );
+        },
+
+        normalizePresentationGenerationError(error) {
+            const payload = error?.payload && typeof error.payload === 'object' ? error.payload : {};
+            const raw = String(payload.error || payload.detail || error?.message || '').trim();
+            if (!raw) return '演示文稿生成失败，请稍后重试';
+
+            const lower = raw.toLowerCase();
+            if (
+                lower.includes('failed to fetch')
+                || lower.includes('networkerror')
+                || lower.includes('load failed')
+            ) {
+                return '网络连接异常，演示文稿状态查询失败，请稍后重试';
+            }
+
+            if (
+                raw.startsWith('HTTP 502')
+                || raw.startsWith('HTTP 503')
+                || raw.startsWith('HTTP 504')
+            ) {
+                return '演示文稿服务暂时不可用，请稍后重试';
+            }
+
+            return raw;
+        },
+
         openPresentationPdf() {
             if (!this.canGeneratePresentation()) {
                 this.showToast(this.getLevelCapabilityDeniedMessage({
@@ -1239,7 +1287,18 @@
                         this.showToast('演示文稿仍在生成中，请稍后再试', 'warning');
                     }
                 } catch (error) {
-                    // 忽略短暂错误，继续轮询
+                    if (this.isRetriablePresentationPollingError(error)) {
+                        return;
+                    }
+                    const message = this.normalizePresentationGenerationError(error);
+                    this.stopPresentationPolling();
+                    this.generatingSlides = false;
+                    this.generatingSlidesReportName = '';
+                    if (this.selectedReport === currentReportName) {
+                        this.presentationState = 'failed';
+                        this.presentationStageStatus = 'failed';
+                    }
+                    this.showToast(message, 'error');
                 }
             };
 

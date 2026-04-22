@@ -32225,6 +32225,108 @@ def build_paper2slides_status_payload(status_payload: dict, result_payload: Opti
     }
 
 
+def extract_paper2slides_failure_detail(status_payload: Optional[dict], result_payload: Optional[dict] = None) -> dict:
+    raw_error = ""
+    if isinstance(status_payload, dict):
+        raw_error = str(status_payload.get("error") or "").strip()
+    if not raw_error and isinstance(result_payload, dict):
+        raw_error = str(result_payload.get("error") or "").strip()
+
+    upstream_message = ""
+    upstream_type = ""
+    upstream_code = ""
+
+    detail_text = raw_error
+    if " - " in raw_error:
+        _prefix, _sep, maybe_payload = raw_error.partition(" - ")
+        if maybe_payload.strip().startswith("{"):
+            detail_text = maybe_payload.strip()
+
+    if detail_text.startswith("{"):
+        try:
+            parsed = ast.literal_eval(detail_text)
+        except Exception:
+            parsed = None
+        if isinstance(parsed, dict):
+            error_payload = parsed.get("error") if isinstance(parsed.get("error"), dict) else parsed
+            if isinstance(error_payload, dict):
+                upstream_message = str(error_payload.get("message") or "").strip()
+                upstream_type = str(error_payload.get("type") or "").strip()
+                upstream_code = str(error_payload.get("code") or "").strip()
+
+    status_code = ""
+    match = re.search(r"error code:\s*(\d+)", raw_error, flags=re.IGNORECASE)
+    if match:
+        status_code = match.group(1)
+
+    lowered = raw_error.lower()
+    if (
+        upstream_type == "insufficient_quota"
+        or upstream_code == "insufficient_quota"
+        or status_code == "402"
+        or "insufficient_quota" in lowered
+        or "used up your points" in lowered
+    ):
+        return {
+            "message": "演示文稿生成失败：模型额度不足，请补充可用额度后重试",
+            "error_code": "paper2slides_insufficient_quota",
+            "raw_error": raw_error,
+            "upstream_message": upstream_message,
+            "upstream_type": upstream_type or upstream_code,
+            "upstream_status_code": status_code,
+        }
+
+    if upstream_message:
+        return {
+            "message": f"演示文稿生成失败：{upstream_message}",
+            "error_code": "paper2slides_generation_failed",
+            "raw_error": raw_error,
+            "upstream_message": upstream_message,
+            "upstream_type": upstream_type or upstream_code,
+            "upstream_status_code": status_code,
+        }
+
+    fallback_message = raw_error or "Paper2Slides 未返回可用演示文稿产物"
+    return {
+        "message": f"演示文稿生成失败：{fallback_message}",
+        "error_code": "paper2slides_generation_failed",
+        "raw_error": raw_error,
+        "upstream_message": upstream_message,
+        "upstream_type": upstream_type or upstream_code,
+        "upstream_status_code": status_code,
+    }
+
+
+def build_paper2slides_failure_response(
+    filename: str,
+    execution_id: str,
+    status_payload: dict,
+    result_payload: Optional[dict] = None,
+) -> tuple[dict, int]:
+    failure_detail = extract_paper2slides_failure_detail(status_payload, result_payload)
+    record_presentation_execution(
+        filename,
+        execution_id,
+        metadata={
+            "provider": "paper2slides",
+            "paper2slides_job_id": execution_id,
+            "last_error": failure_detail.get("raw_error") or "",
+            "failed_at": datetime.now().isoformat(),
+        },
+    )
+    clear_presentation_execution(filename)
+    return {
+        "processing": False,
+        "failed": True,
+        "execution_id": execution_id,
+        "error": failure_detail.get("message") or "演示文稿生成失败",
+        "error_code": failure_detail.get("error_code") or "paper2slides_generation_failed",
+        "paper2slides_error": failure_detail.get("raw_error") or "",
+        "paper2slides_status": status_payload,
+        "paper2slides_result": result_payload or {},
+    }, 502
+
+
 def send_report_to_paper2slides_service(filename: str, report_file: Path, report_content: str) -> tuple[dict, int]:
     client = get_paper2slides_client()
     if not client.is_configured():
@@ -32282,6 +32384,15 @@ def check_paper2slides_status(filename: str, execution_id: str) -> tuple[dict, i
     client = get_paper2slides_client()
     status_payload = client.get_status(execution_id)
     result_payload, ready = client.get_result(execution_id)
+    normalized_status = str(status_payload.get("status") or "").strip().lower()
+
+    if normalized_status == "failed":
+        return build_paper2slides_failure_response(
+            filename,
+            execution_id,
+            status_payload,
+            result_payload,
+        )
 
     if not ready:
         record_presentation_execution(filename, execution_id, metadata={
@@ -32299,13 +32410,12 @@ def check_paper2slides_status(filename: str, execution_id: str) -> tuple[dict, i
 
     pdf_url = select_primary_artifact_url(result_payload or {})
     if not pdf_url:
-        return {
-            "processing": False,
-            "execution_id": execution_id,
-            "error": "Paper2Slides 未返回可用演示文稿产物",
-            "paper2slides_status": status_payload,
-            "paper2slides_result": result_payload or {},
-        }, 502
+        return build_paper2slides_failure_response(
+            filename,
+            execution_id,
+            status_payload,
+            result_payload,
+        )
     if pdf_url.startswith("/"):
         pdf_url = urljoin(f"{PAPER2SLIDES_API_URL.rstrip('/')}/", pdf_url.lstrip("/"))
 
@@ -42655,14 +42765,8 @@ def send_report_to_refly(filename):
     try:
         report_content = _load_report_content(filename)
         if get_presentation_provider() == "paper2slides":
-            try:
-                payload, status_code = send_report_to_paper2slides_service(filename, report_file, report_content)
-                return jsonify(payload), status_code
-            except requests.RequestException as exc:
-                if ENABLE_DEBUG_LOG:
-                    print(f"⚠️ Paper2Slides 服务请求异常，准备回退 Refly: {exc}")
-                if not is_refly_configured():
-                    return jsonify({"error": "Paper2Slides 服务不可用，且 Refly 未配置"}), 502
+            payload, status_code = send_report_to_paper2slides_service(filename, report_file, report_content)
+            return jsonify(payload), status_code
 
         report_title = report_content.strip().splitlines()[0].lstrip("#").strip() if report_content else ""
         materialized_report_file = _materialize_report_file_for_local_use(filename, report_content)
