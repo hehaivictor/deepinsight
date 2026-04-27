@@ -1,7 +1,16 @@
 {
-  "version": "2.0.0",
-  "releaseDate": "2026-04-22",
+  "version": "2.0.1",
+  "releaseDate": "2026-04-27",
   "changelog": [
+    {
+      "version": "2.0.1",
+      "date": "2026-04-27",
+      "type": "patch",
+      "title": "忽略 Playwright MCP 本地缓存",
+      "changes": [
+        "配置忽略 .playwright-mcp 本地运行目录，避免误提交临时状态文件"
+      ]
+    },
     {
       "version": "2.0.0",
       "date": "2026-04-22",
