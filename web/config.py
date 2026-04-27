@@ -14,17 +14,17 @@ MODEL_NAME = "doubao-seed-2-0-pro"  # 默认主模型（问题链路）
 # 作用：设置问题生成链路使用的模型名称。
 QUESTION_MODEL_NAME = MODEL_NAME
 # 作用：设置深度访谈模式下 question lane 的专用模型名称。
-QUESTION_MODEL_NAME_DEEP = "deepseek-ai/DeepSeek-V3.2"
+QUESTION_MODEL_NAME_DEEP = "deepseek-v4-flash"
 # 作用：设置报告主链路使用的模型名称。
-REPORT_MODEL_NAME = "deepseek-ai/DeepSeek-V3.2"
+REPORT_MODEL_NAME = "deepseek-v4-pro"
 # 作用：设置报告草案阶段使用的模型名称。
 REPORT_DRAFT_MODEL_NAME = REPORT_MODEL_NAME
 # 作用：设置报告审稿阶段使用的模型名称。
 REPORT_REVIEW_MODEL_NAME = "doubao-seed-2-0-pro"
 # 作用：设置摘要链路使用的模型名称。
-SUMMARY_MODEL_NAME = "deepseek-ai/DeepSeek-V3.2"
+SUMMARY_MODEL_NAME = "deepseek-v4-flash"
 # 作用：设置搜索决策链路使用的模型名称。
-SEARCH_DECISION_MODEL_NAME = "doubao-seed-2.0-code"
+SEARCH_DECISION_MODEL_NAME = "deepseek-v4-flash"
 # 作用：设置评分链路使用的模型名称。
 ASSESSMENT_MODEL_NAME = "deepseek-ai/DeepSeek-V3.2"
 
@@ -44,9 +44,9 @@ MAX_TOKENS_QUESTION = 2200
 # 作用：设置报告主生成链路单次响应允许输出的最大 token 数。
 MAX_TOKENS_REPORT = 8000
 # 作用：设置摘要链路单次响应允许输出的最大 token 数。
-MAX_TOKENS_SUMMARY = 600
+MAX_TOKENS_SUMMARY = 900
 # 作用：设置搜索决策首轮轻量判断阶段允许输出的最大 token 数。
-SEARCH_DECISION_FIRST_MAX_TOKENS = 220
+SEARCH_DECISION_FIRST_MAX_TOKENS = 420
 # 作用：设置搜索决策重试阶段允许输出的最大 token 数。
 SEARCH_DECISION_RETRY_MAX_TOKENS = 420
 # 作用：设置单题评分调用允许输出的最大 token 数。
@@ -163,7 +163,7 @@ QUESTION_HEDGE_ADAPTIVE_TIMEOUT_RATIO = 0.45
 # 作用：按 lane 覆盖问题快档超时时间。
 QUESTION_FAST_TIMEOUT_BY_LANE = {"question": 8.0, "summary": 6.0, "report": 12.0, "search_decision": 6.0}
 # 作用：按 lane 覆盖问题快档最大 token 数。
-QUESTION_FAST_MAX_TOKENS_BY_LANE = {"question": 900, "summary": 600, "report": 1200, "search_decision": 420}
+QUESTION_FAST_MAX_TOKENS_BY_LANE = {"question": 900, "summary": 900, "report": 1200, "search_decision": 420}
 
 # 作用：控制发布期问题链路是否默认启用保守降档策略。
 QUESTION_RELEASE_CONSERVATIVE_MODE = False

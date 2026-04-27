@@ -5623,6 +5623,18 @@ class ComprehensiveApiTests(unittest.TestCase):
         self.assertNotIn("Q1", cleaned)
         self.assertNotIn("Q7", cleaned)
 
+    def test_normalize_report_time_fields_strips_leading_assistant_preamble(self):
+        raw_text = (
+            "好的，作为一名专业的需求分析师，我将根据您提供的访谈记录，为您生成一份专业的访谈报告。\n\n"
+            "---\n\n"
+            "## 机加工艺生成智能产品调研访谈报告\n\n"
+            "### 1. 访谈概述\n"
+        )
+        cleaned = self.server.normalize_report_time_fields(raw_text)
+
+        self.assertTrue(cleaned.startswith("## 机加工艺生成智能产品调研访谈报告"))
+        self.assertNotIn("好的，作为一名专业的需求分析师", cleaned)
+
     def test_validate_report_draft_removes_inline_evidence_markers(self):
         draft = {
             "overview": "这是概述[证据:Q1,Q2]（Q1, Q2）。",
