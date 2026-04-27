@@ -1,7 +1,18 @@
 {
-  "version": "2.0.1",
+  "version": "2.1.0",
   "releaseDate": "2026-04-27",
   "changelog": [
+    {
+      "version": "2.1.0",
+      "date": "2026-04-27",
+      "type": "minor",
+      "title": "优化象限图中文显示",
+      "changes": [
+        "新增 quadrantChart 渲染后文本本地化。",
+        "支持从列表和表格解析数据点中文映射。",
+        "保留 Mermaid 英文源码以避免解析失败。"
+      ]
+    },
     {
       "version": "2.0.1",
       "date": "2026-04-27",
