@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "branch": "main",
+  "baseRef": "origin/main",
+  "sourceCommit": "e921d92",
+  "committedAt": "2026-04-27T11:40:26+08:00",
+  "versionType": "patch",
+  "title": "忽略 Playwright MCP 本地缓存",
+  "changes": [
+    "配置忽略 .playwright-mcp 本地运行目录，避免误提交临时状态文件"
+  ],
+  "changedFiles": [
+    ".gitignore"
+  ]
+}

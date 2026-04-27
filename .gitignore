@@ -47,6 +47,7 @@ Thumbs.db
 .claude/
 .codex/*
 !.codex/ship.yml
+.playwright-mcp/
 
 # macOS
 .DS_Store
