@@ -10,10 +10,44 @@ from typing import Any, Optional
 import requests
 
 
+_RUNTIME_BINDINGS_LOCK = None
+
+
+def _get_runtime_bindings_lock():
+    global _RUNTIME_BINDINGS_LOCK
+    if _RUNTIME_BINDINGS_LOCK is None:
+        import threading
+
+        _RUNTIME_BINDINGS_LOCK = threading.RLock()
+    return _RUNTIME_BINDINGS_LOCK
+
+
 def configure_report_generation_runtime(bindings: dict[str, Any]) -> None:
     if not isinstance(bindings, dict):
         raise TypeError("bindings must be a dict")
-    globals().update(bindings)
+    with _get_runtime_bindings_lock():
+        globals().update(bindings)
+
+
+def run_report_generation_runtime_with_bindings(bindings: dict[str, Any], func, *args, **kwargs):
+    if not isinstance(bindings, dict):
+        raise TypeError("bindings must be a dict")
+    with _get_runtime_bindings_lock():
+        globals().update(bindings)
+        try:
+            func_globals = getattr(func, "__globals__", None)
+            if isinstance(func_globals, dict):
+                func_globals.update(bindings)
+        except Exception:
+            pass
+        return func(*args, **kwargs)
+
+
+def _call_runtime_patchpoint(name: str, fallback, *args, **kwargs):
+    target = globals().get(name)
+    if callable(target):
+        return target(*args, **kwargs)
+    return fallback(*args, **kwargs)
 
 
 def _compute_table_row_readiness_v3(items: list, required_fields: list[str]) -> float:
@@ -1601,7 +1635,9 @@ def run_report_generation_job(
                     next_hint="完成证据包后会生成结构化草案",
                     progress_override=20,
                 )
-                v3_result = generate_report_v3_pipeline(
+                v3_result = _call_runtime_patchpoint(
+                    "_server_generate_report_v3_pipeline",
+                    generate_report_v3_pipeline,
                     session,
                     session_id=session_id,
                     preferred_lane="report",
@@ -1701,7 +1737,9 @@ def run_report_generation_job(
                 )
                 failover_suffix = f"_failover_{REPORT_V3_FAILOVER_LANE}"
                 failover_started_at = _time.perf_counter()
-                failover_result = generate_report_v3_pipeline(
+                failover_result = _call_runtime_patchpoint(
+                    "_server_generate_report_v3_pipeline",
+                    generate_report_v3_pipeline,
                     session,
                     session_id=session_id,
                     preferred_lane=REPORT_V3_FAILOVER_LANE,
@@ -1947,7 +1985,7 @@ def run_report_generation_job(
                 2,
             )
 
-            if is_unusable_legacy_report_content(report_content):
+            if _call_runtime_patchpoint("_server_is_unusable_legacy_report_content", is_unusable_legacy_report_content, report_content):
                 fallback_primary_lane = resolve_call_lane(call_type="report_legacy_fallback")
                 fallback_primary_model = resolve_model_name_for_lane(
                     call_type="report_legacy_fallback",
@@ -1976,7 +2014,7 @@ def run_report_generation_job(
                         timeout=legacy_timeout,
                         preferred_lane=retry_lane,
                     )
-                    if not is_unusable_legacy_report_content(retry_content):
+                    if not _call_runtime_patchpoint("_server_is_unusable_legacy_report_content", is_unusable_legacy_report_content, retry_content):
                         report_content = retry_content
                     else:
                         if ENABLE_DEBUG_LOG:
@@ -1993,7 +2031,9 @@ def run_report_generation_job(
 
             if report_content:
                 report_content = report_content + generate_interview_appendix(session)
-                quality_meta = build_report_quality_meta_fallback(
+                quality_meta = _call_runtime_patchpoint(
+                    "_server_build_report_quality_meta_fallback",
+                    build_report_quality_meta_fallback,
                     session,
                     mode="legacy_ai_fallback",
                     evidence_pack=fallback_evidence_pack,
@@ -2063,7 +2103,12 @@ def run_report_generation_job(
             progress_override=84,
         )
         report_content = generate_simple_report(session)
-        quality_meta = build_report_quality_meta_fallback(session, mode="simple_template_fallback")
+        quality_meta = _call_runtime_patchpoint(
+            "_server_build_report_quality_meta_fallback",
+            build_report_quality_meta_fallback,
+            session,
+            mode="simple_template_fallback",
+        )
         session["last_report_quality_meta"] = quality_meta
         update_report_generation_status(
             session_id,

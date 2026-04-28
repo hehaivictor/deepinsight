@@ -86,6 +86,7 @@ from web.server_modules.report_generation_runtime import (
     configure_report_generation_runtime,
     generate_report_v3_pipeline as module_generate_report_v3_pipeline,
     is_unusable_legacy_report_content as module_is_unusable_legacy_report_content,
+    run_report_generation_runtime_with_bindings,
     run_report_generation_job as module_run_report_generation_job,
 )
 from web.server_modules.interview_runtime import (
@@ -95,6 +96,7 @@ from web.server_modules.interview_runtime import (
     _call_question_with_optional_hedge as module_call_question_with_optional_hedge,
     _prepare_question_generation_runtime as module_prepare_question_generation_runtime,
     _select_question_generation_runtime_profile as module_select_question_generation_runtime_profile,
+    run_interview_runtime_with_bindings,
 )
 
 try:
@@ -193,7 +195,6 @@ if CONFIG_RESOLUTION_MODE not in {"auto", "hybrid", "env_only"}:
 ENV_MANAGED_CONFIG_EXACT_KEYS = {
     "ADMIN_PHONE_NUMBERS",
     "ADMIN_USER_IDS",
-    "AI_CLIENT_EAGER_INIT",
     "AI_CLIENT_INIT_CONNECTION_TEST",
     "AUTH_DB_PATH",
     "BUILTIN_SCENARIOS_DIR",
@@ -912,6 +913,7 @@ REPORT_V3_PROFILE = _cfg_text("REPORT_V3_PROFILE", "balanced").strip().lower()
 if REPORT_V3_PROFILE not in {"balanced", "quality"}:
     REPORT_V3_PROFILE = "balanced"
 REPORT_V3_RELEASE_CONSERVATIVE_MODE = _cfg_bool("REPORT_V3_RELEASE_CONSERVATIVE_MODE", True)
+REPORT_V3_RELEASE_CONSERVATIVE_MODE_INITIAL = REPORT_V3_RELEASE_CONSERVATIVE_MODE
 report_default_review_timeout = min(REPORT_API_TIMEOUT, 120.0 if REPORT_V3_PROFILE == "balanced" else 150.0)
 REPORT_REVIEW_API_TIMEOUT = _cfg_float("REPORT_REVIEW_API_TIMEOUT", report_default_review_timeout)
 REPORT_REVIEW_API_TIMEOUT = max(30.0, min(REPORT_REVIEW_API_TIMEOUT, REPORT_API_TIMEOUT))
@@ -1047,9 +1049,16 @@ def normalize_report_profile_choice(raw_profile: str, fallback: str = "") -> str
 
 def get_report_v3_runtime_config(profile_choice: str = "") -> dict:
     profile = normalize_report_profile_choice(profile_choice, fallback=REPORT_V3_PROFILE)
+    release_mode_default = bool(REPORT_V3_RELEASE_CONSERVATIVE_MODE)
+    if release_mode_default != bool(REPORT_V3_RELEASE_CONSERVATIVE_MODE_INITIAL):
+        release_mode_enabled = release_mode_default
+    else:
+        release_mode_enabled = _cfg_bool(
+            "REPORT_V3_RELEASE_CONSERVATIVE_MODE",
+            release_mode_default,
+        )
     release_conservative_mode = bool(
-        _cfg_bool("REPORT_V3_RELEASE_CONSERVATIVE_MODE", REPORT_V3_RELEASE_CONSERVATIVE_MODE)
-        and profile == "balanced"
+        release_mode_enabled and profile == "balanced"
     )
 
     draft_timeout_default = min(REPORT_API_TIMEOUT, 140.0 if profile == "balanced" else 180.0)
@@ -2624,10 +2633,11 @@ def _collect_runtime_security_validation_issues() -> tuple[list[str], list[str]]
         message = "SECRET_KEY 仍是模板占位值，请替换为高强度随机密钥"
         (errors if strict_mode else warnings).append(message)
 
-    if INSTANCE_SCOPE_ENFORCEMENT_ENABLED:
+    scope_key_was_explicit = "INSTANCE_SCOPE_KEY" in LOADED_ENV_KEYS or os.environ.get("INSTANCE_SCOPE_KEY") is not None
+    if INSTANCE_SCOPE_ENFORCEMENT_ENABLED or scope_key_was_explicit:
         if not scope_key:
             message = "INSTANCE_SCOPE_KEY 为空，共享 data 目录时可能发生跨实例串看"
-            if strict_mode or has_explicit_env:
+            if strict_mode or has_explicit_env or scope_key_was_explicit:
                 (errors if strict_mode else warnings).append(message)
         elif placeholder_scope_configured:
             message = "INSTANCE_SCOPE_KEY 仍是模板占位值，请替换为稳定唯一的实例标识"
@@ -9165,7 +9175,7 @@ def get_license_enforcement_state() -> dict:
         source_label = "管理员手动设置"
     else:
         enabled = default_enabled
-        source = str(default_state.get("source") or "startup_default")
+        source = "env_default"
         source_label = str(default_state.get("source_label") or "启动默认值")
     message = "登录后必须绑定有效 License 才能继续使用。" if enabled else "License 验证已关闭，无需绑定即可使用。"
     return {
@@ -12576,6 +12586,24 @@ def require_login(func):
     return wrapper
 
 
+def is_admin_operation_license_required(path: str) -> bool:
+    normalized = str(path or "").strip()
+    if normalized.startswith("/api/admin/licenses/bootstrap"):
+        return False
+    if normalized.startswith((
+        "/api/admin/license-enforcement",
+        "/api/admin/presentation-feature",
+        "/api/admin/licenses",
+        "/api/admin/users",
+        "/api/admin/ownership-migrations",
+        "/api/admin/config-center",
+        "/api/metrics",
+        "/api/summaries",
+    )):
+        return True
+    return False
+
+
 def require_admin(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -12584,6 +12612,15 @@ def require_admin(func):
             return jsonify({"error": "请先登录"}), 401
         if not is_user_admin(user):
             return jsonify({"error": "仅管理员可访问"}), 403
+        if is_admin_operation_license_required(request.path):
+            license_payload = build_license_status_payload_for_user(user)
+            if not license_payload.get("has_valid_license"):
+                license_status = str(license_payload.get("status") or "missing")
+                return jsonify({
+                    "error": _license_status_message(license_status),
+                    "error_code": _license_status_error_code(license_status),
+                    "license_status": license_status,
+                }), 403
         return func(*args, **kwargs)
 
     return wrapper
@@ -12592,8 +12629,6 @@ def require_admin(func):
 def require_valid_license(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if not is_license_enforcement_enabled():
-            return func(*args, **kwargs)
         user = get_current_user()
         if not user:
             return jsonify({"error": "请先登录"}), 401
@@ -20463,8 +20498,9 @@ def build_interview_prompt(
     search_mode: str = "default",
     runtime_probe: bool = False,
 ) -> tuple[str, list, dict]:
-    _sync_interview_runtime_bindings()
-    return module_build_interview_prompt(
+    return run_interview_runtime_with_bindings(
+        _sync_interview_runtime_bindings(),
+        module_build_interview_prompt,
         session,
         dimension,
         all_dim_logs,
@@ -24717,8 +24753,14 @@ def build_quality_gate_issues_v3(quality_meta: dict, thresholds: Optional[dict] 
 _INTERVIEW_RUNTIME_MODULE_OWNED_NAMES = (
     "_normalize_question_prompt_output_mode",
     "_clip_prompt_text",
+    "build_interview_prompt",
+    "_select_question_generation_runtime_profile",
+    "_prepare_question_generation_runtime",
+    "_call_question_with_optional_hedge",
     "_scale_question_lane_numeric_map",
     "configure_interview_runtime",
+    "generate_question_with_tiered_strategy",
+    "run_interview_runtime_with_bindings",
 )
 
 
@@ -24758,20 +24800,49 @@ def _dispatch_call_question_with_optional_hedge(*args, **kwargs):
     return _dispatch_runtime_patchpoint("_call_question_with_optional_hedge", *args, **kwargs)
 
 
-def _sync_interview_runtime_bindings() -> None:
+def _dispatch_generate_report_v3_pipeline(*args, **kwargs):
+    return _dispatch_runtime_patchpoint("generate_report_v3_pipeline", *args, **kwargs)
+
+
+def _dispatch_build_report_quality_meta_fallback(*args, **kwargs):
+    return _dispatch_runtime_patchpoint("build_report_quality_meta_fallback", *args, **kwargs)
+
+
+def _dispatch_is_unusable_legacy_report_content(*args, **kwargs):
+    return _dispatch_runtime_patchpoint("is_unusable_legacy_report_content", *args, **kwargs)
+
+
+def _sync_interview_runtime_bindings() -> dict:
     bindings = dict(globals())
     for name in _INTERVIEW_RUNTIME_MODULE_OWNED_NAMES:
         bindings.pop(name, None)
     bindings.update({
-        "build_interview_prompt": _dispatch_build_interview_prompt,
-        "_select_question_generation_runtime_profile": _dispatch_select_question_generation_runtime_profile,
-        "_call_question_with_optional_hedge": _dispatch_call_question_with_optional_hedge,
+        "_server_build_interview_prompt": _dispatch_build_interview_prompt,
+        "_server_select_question_generation_runtime_profile": _dispatch_select_question_generation_runtime_profile,
+        "_server_call_question_with_optional_hedge": _dispatch_call_question_with_optional_hedge,
     })
     configure_interview_runtime(bindings)
+    return bindings
 
 
-def _sync_report_generation_runtime_bindings() -> None:
-    configure_report_generation_runtime({
+_REPORT_GENERATION_RUNTIME_MODULE_OWNED_NAMES = (
+    "_get_runtime_bindings_lock",
+    "_compute_table_row_readiness_v3",
+    "_is_action_metric_measurable_v3",
+    "_classify_action_timeline_bucket_v3",
+    "build_report_quality_meta_fallback",
+    "classify_v3_pipeline_exception",
+    "compute_report_quality_meta_v3",
+    "configure_report_generation_runtime",
+    "generate_report_v3_pipeline",
+    "is_unusable_legacy_report_content",
+    "run_report_generation_job",
+    "run_report_generation_runtime_with_bindings",
+)
+
+
+def _sync_report_generation_runtime_bindings() -> dict:
+    bindings = {
         "_collect_claim_entries_for_quality": _collect_claim_entries_for_quality,
         "_collect_report_reference_materials": _collect_report_reference_materials,
         "_derive_action_generation_strategy_v3": _derive_action_generation_strategy_v3,
@@ -24865,17 +24936,34 @@ def _sync_report_generation_runtime_bindings() -> None:
         "validate_report_draft_v3": validate_report_draft_v3,
         "write_solution_sidecar": write_solution_sidecar,
         "run_report_generation_job": run_report_generation_job,
-    })
+    }
+    for name in _REPORT_GENERATION_RUNTIME_MODULE_OWNED_NAMES:
+        bindings.pop(name, None)
+    bindings["_server_build_report_quality_meta_fallback"] = _dispatch_build_report_quality_meta_fallback
+    bindings["_server_generate_report_v3_pipeline"] = _dispatch_generate_report_v3_pipeline
+    bindings["_server_is_unusable_legacy_report_content"] = _dispatch_is_unusable_legacy_report_content
+    configure_report_generation_runtime(bindings)
+    return bindings
 
 
 def compute_report_quality_meta_v3(draft: dict, evidence_pack: dict, issues: list) -> dict:
-    _sync_report_generation_runtime_bindings()
-    return module_compute_report_quality_meta_v3(draft, evidence_pack, issues)
+    return run_report_generation_runtime_with_bindings(
+        _sync_report_generation_runtime_bindings(),
+        module_compute_report_quality_meta_v3,
+        draft,
+        evidence_pack,
+        issues,
+    )
 
 
 def build_report_quality_meta_fallback(session: dict, mode: str, evidence_pack: Optional[dict] = None) -> dict:
-    _sync_report_generation_runtime_bindings()
-    return module_build_report_quality_meta_fallback(session, mode, evidence_pack=evidence_pack)
+    return run_report_generation_runtime_with_bindings(
+        _sync_report_generation_runtime_bindings(),
+        module_build_report_quality_meta_fallback,
+        session,
+        mode,
+        evidence_pack=evidence_pack,
+    )
 
 
 def ensure_flowchart_semantic_styles(mermaid_text: str) -> str:
@@ -25936,8 +26024,9 @@ def generate_report_v3_pipeline(
     report_profile: str = "",
     ) -> Optional[dict]:
     """执行 V3 报告生成流水线。失败时返回包含 reason 的调试结构。"""
-    _sync_report_generation_runtime_bindings()
-    return module_generate_report_v3_pipeline(
+    return run_report_generation_runtime_with_bindings(
+        _sync_report_generation_runtime_bindings(),
+        module_generate_report_v3_pipeline,
         session,
         session_id=session_id,
         preferred_lane=preferred_lane,
@@ -29117,8 +29206,9 @@ def _select_question_generation_runtime_profile(
     allow_fast_path: bool = True,
     mode_strategy: Optional[dict] = None,
 ) -> dict:
-    _sync_interview_runtime_bindings()
-    return module_select_question_generation_runtime_profile(
+    return run_interview_runtime_with_bindings(
+        _sync_interview_runtime_bindings(),
+        module_select_question_generation_runtime_profile,
         prompt,
         truncated_docs=truncated_docs,
         decision_meta=decision_meta,
@@ -29137,8 +29227,9 @@ def _prepare_question_generation_runtime(
     base_call_type: str = "question",
     allow_fast_path: bool = True,
 ) -> dict:
-    _sync_interview_runtime_bindings()
-    return module_prepare_question_generation_runtime(
+    return run_interview_runtime_with_bindings(
+        _sync_interview_runtime_bindings(),
+        module_prepare_question_generation_runtime,
         session,
         dimension,
         all_dim_logs,
@@ -29165,8 +29256,9 @@ def _call_question_with_optional_hedge(
     lane_runtime_overrides: Optional[dict] = None,
     lane_model_overrides: Optional[dict] = None,
 ) -> tuple[Optional[str], str, dict]:
-    _sync_interview_runtime_bindings()
-    return module_call_question_with_optional_hedge(
+    return run_interview_runtime_with_bindings(
+        _sync_interview_runtime_bindings(),
+        module_call_question_with_optional_hedge,
         prompt,
         max_tokens,
         call_type,
@@ -29194,8 +29286,9 @@ def generate_question_with_tiered_strategy(
     fast_prompt: Optional[str] = None,
     runtime_profile: Optional[dict] = None,
 ) -> tuple[Optional[str], Optional[dict], str]:
-    _sync_interview_runtime_bindings()
-    return module_generate_question_with_tiered_strategy(
+    return run_interview_runtime_with_bindings(
+        _sync_interview_runtime_bindings(),
+        module_generate_question_with_tiered_strategy,
         prompt,
         truncated_docs=truncated_docs,
         fast_truncated_docs=fast_truncated_docs,
@@ -31476,8 +31569,11 @@ def attempt_salvage_v3_review_failure(session: dict, v3_result: Optional[dict]) 
 
 def is_unusable_legacy_report_content(content: Optional[str]) -> bool:
     """检测标准回退报告是否为无效的工具确认话术。"""
-    _sync_report_generation_runtime_bindings()
-    return module_is_unusable_legacy_report_content(content)
+    return run_report_generation_runtime_with_bindings(
+        _sync_report_generation_runtime_bindings(),
+        module_is_unusable_legacy_report_content,
+        content,
+    )
 
 
 def strip_report_leading_assistant_preamble(content: str) -> str:
@@ -31685,8 +31781,11 @@ def can_use_v3_failover_lane() -> bool:
 
 def classify_v3_pipeline_exception(exc: Exception) -> str:
     """归类 V3 流水线异常类型，便于区分运行异常与内容门禁问题。"""
-    _sync_report_generation_runtime_bindings()
-    return module_classify_v3_pipeline_exception(exc)
+    return run_report_generation_runtime_with_bindings(
+        _sync_report_generation_runtime_bindings(),
+        module_classify_v3_pipeline_exception,
+        exc,
+    )
 
 
 def run_report_generation_job(
@@ -31698,8 +31797,9 @@ def run_report_generation_job(
     source_report_name: str = "",
 ) -> None:
     """后台生成报告任务。"""
-    _sync_report_generation_runtime_bindings()
-    return module_run_report_generation_job(
+    return run_report_generation_runtime_with_bindings(
+        _sync_report_generation_runtime_bindings(),
+        module_run_report_generation_job,
         session_id,
         user_id,
         request_id,
@@ -43923,6 +44023,7 @@ def admin_extend_license(license_id: int):
 
 @app.route('/api/admin/users', methods=['GET'])
 @require_admin
+@require_valid_license
 def admin_search_users():
     query = request.args.get("q", "")
     limit = request.args.get("limit", 20, type=int)
@@ -43935,6 +44036,7 @@ def admin_search_users():
 
 @app.route('/api/admin/ownership-migrations/audit', methods=['POST'])
 @require_admin
+@require_valid_license
 def admin_audit_ownership():
     data = request.get_json(silent=True) or {}
     try:
@@ -43950,6 +44052,7 @@ def admin_audit_ownership():
 
 @app.route('/api/admin/ownership-migrations/preview', methods=['POST'])
 @require_admin
+@require_valid_license
 def admin_preview_ownership_migration():
     data = request.get_json(silent=True) or {}
     try:
@@ -43978,6 +44081,7 @@ def admin_preview_ownership_migration():
 
 @app.route('/api/admin/ownership-migrations/apply', methods=['POST'])
 @require_admin
+@require_valid_license
 def admin_apply_ownership_migration():
     data = request.get_json(silent=True) or {}
     preview = _get_admin_ownership_preview()
@@ -44024,6 +44128,7 @@ def admin_apply_ownership_migration():
 
 @app.route('/api/admin/ownership-migrations', methods=['GET'])
 @require_admin
+@require_valid_license
 def admin_list_ownership_migrations():
     return jsonify(
         _list_admin_ownership_migrations(limit=request.args.get("limit", 50, type=int))
@@ -44032,6 +44137,7 @@ def admin_list_ownership_migrations():
 
 @app.route('/api/admin/ownership-migrations/rollback', methods=['POST'])
 @require_admin
+@require_valid_license
 def admin_rollback_ownership_migration():
     data = request.get_json(silent=True) or {}
     backup_id = str(data.get("backup_id") or "").strip()
@@ -44046,12 +44152,14 @@ def admin_rollback_ownership_migration():
 
 @app.route('/api/admin/config-center', methods=['GET'])
 @require_admin
+@require_valid_license
 def admin_get_config_center():
     return jsonify(build_admin_config_center_payload())
 
 
 @app.route('/api/admin/config-center/save', methods=['POST'])
 @require_admin
+@require_valid_license
 def admin_save_config_center_group():
     data = request.get_json(silent=True) or {}
     try:

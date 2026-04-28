@@ -29,7 +29,9 @@ SEARCH_DECISION_MODEL_NAME = "deepseek-v4-flash"
 ASSESSMENT_MODEL_NAME = "deepseek-ai/DeepSeek-V3.2"
 
 # ============ AI 客户端通用策略 ===========
-# 客户端启动方式与接入开关请放在 .env；这里只保留非敏感运行默认值。
+# 客户端启动策略保留在 config；接入开关和探测行为请放在 .env。
+# 作用：控制服务启动时是否立刻初始化所有 AI 客户端。
+AI_CLIENT_EAGER_INIT = False
 # 作用：设置 AI 客户端在 SDK 层允许的最大重试次数。
 AI_CLIENT_MAX_RETRIES = 0
 
@@ -421,12 +423,8 @@ SCENARIOS_DIR = ""
 DEEP_MODE_SKIP_FOLLOWUP_CONFIRM = True
 # 作用：控制演示文稿相关能力是否默认启用。
 PRESENTATION_GLOBAL_ENABLED = True
-# 作用：设置 Paper2Slides 服务地址；留空时继续使用 Refly 演示文稿链路。
-PAPER2SLIDES_API_URL = ""
 # 作用：设置 Paper2Slides 服务鉴权 token；本地无鉴权时可留空。
 PAPER2SLIDES_API_TOKEN = ""
-# 作用：设置 Paper2Slides 请求超时时间（秒）。
-PAPER2SLIDES_TIMEOUT = 30
 # 作用：设置 Paper2Slides 统一提示词 profile；未显式指定时默认使用咨询风。
 PAPER2SLIDES_PROFILE = "consulting_exec_cn"
 # 作用：设置提交给 Paper2Slides 的内容类型。

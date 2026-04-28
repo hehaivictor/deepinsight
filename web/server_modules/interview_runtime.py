@@ -7,10 +7,35 @@ import time as _time
 from typing import Any, Optional
 
 
+_RUNTIME_BINDINGS_LOCK = threading.RLock()
+
+
 def configure_interview_runtime(bindings: dict[str, Any]) -> None:
     if not isinstance(bindings, dict):
         raise TypeError("bindings must be a dict")
-    globals().update(bindings)
+    with _RUNTIME_BINDINGS_LOCK:
+        globals().update(bindings)
+
+
+def run_interview_runtime_with_bindings(bindings: dict[str, Any], func, *args, **kwargs):
+    if not isinstance(bindings, dict):
+        raise TypeError("bindings must be a dict")
+    with _RUNTIME_BINDINGS_LOCK:
+        globals().update(bindings)
+        try:
+            func_globals = getattr(func, "__globals__", None)
+            if isinstance(func_globals, dict):
+                func_globals.update(bindings)
+        except Exception:
+            pass
+        return func(*args, **kwargs)
+
+
+def _call_runtime_patchpoint(name: str, fallback, *args, **kwargs):
+    target = globals().get(name)
+    if callable(target):
+        return target(*args, **kwargs)
+    return fallback(*args, **kwargs)
 
 
 def _normalize_question_prompt_output_mode(output_mode: str = "full") -> str:
@@ -1030,7 +1055,9 @@ def _prepare_question_generation_runtime(
     interview_mode = normalize_interview_mode_key(session.get("interview_mode", DEFAULT_INTERVIEW_MODE))
     mode_strategy = get_interview_mode_runtime_strategy(interview_mode)
     search_mode = str(mode_strategy.get("search_mode") or _resolve_prompt_search_mode(base_call_type))
-    probe_full_prompt, probe_truncated_docs, probe_decision_meta = build_interview_prompt(
+    probe_full_prompt, probe_truncated_docs, probe_decision_meta = _call_runtime_patchpoint(
+        "_server_build_interview_prompt",
+        build_interview_prompt,
         session,
         dimension,
         all_dim_logs,
@@ -1040,7 +1067,9 @@ def _prepare_question_generation_runtime(
         search_mode=search_mode,
         runtime_probe=True,
     )
-    runtime_profile = _select_question_generation_runtime_profile(
+    runtime_profile = _call_runtime_patchpoint(
+        "_server_select_question_generation_runtime_profile",
+        _select_question_generation_runtime_profile,
         probe_full_prompt,
         truncated_docs=probe_truncated_docs,
         decision_meta=probe_decision_meta,
@@ -1109,7 +1138,9 @@ def _prepare_question_generation_runtime(
     fast_prompt_mode = str((decision_meta or {}).get("output_mode", "full") or "full")
     fast_allow_compacted_docs = False
     if runtime_profile.get("allow_fast_path") and runtime_profile.get("fast_output_mode") == "light":
-        light_prompt, light_truncated_docs, light_decision_meta = build_interview_prompt(
+        light_prompt, light_truncated_docs, light_decision_meta = _call_runtime_patchpoint(
+            "_server_build_interview_prompt",
+            build_interview_prompt,
             session,
             dimension,
             all_dim_logs,
@@ -1134,7 +1165,9 @@ def _prepare_question_generation_runtime(
             fast_prompt_mode = str((light_decision_meta or {}).get("output_mode", "light") or "light")
             fast_allow_compacted_docs = bool(light_compaction_allowed)
     else:
-        full_prompt, truncated_docs, decision_meta = build_interview_prompt(
+        full_prompt, truncated_docs, decision_meta = _call_runtime_patchpoint(
+            "_server_build_interview_prompt",
+            build_interview_prompt,
             session,
             dimension,
             all_dim_logs,
@@ -1557,7 +1590,9 @@ def generate_question_with_tiered_strategy(
         )
 
     if effective_fast_allowed and not fast_skip_reason:
-        fast_response, fast_lane, fast_meta = _call_question_with_optional_hedge(
+        fast_response, fast_lane, fast_meta = _call_runtime_patchpoint(
+            "_server_call_question_with_optional_hedge",
+            _call_question_with_optional_hedge,
             effective_fast_prompt,
             max_tokens=fast_primary_max_tokens,
             call_type=f"{base_call_type}_fast",
@@ -1593,7 +1628,9 @@ def generate_question_with_tiered_strategy(
     elif debug and effective_fast_allowed:
         print(f"ℹ️ 跳过快档：{_describe_question_fast_skip_reason(fast_skip_reason)}，直接走全量竞速")
 
-    full_response, full_lane, full_meta = _call_question_with_optional_hedge(
+    full_response, full_lane, full_meta = _call_runtime_patchpoint(
+        "_server_call_question_with_optional_hedge",
+        _call_question_with_optional_hedge,
         prompt,
         max_tokens=full_primary_max_tokens,
         call_type=base_call_type,
@@ -1625,7 +1662,9 @@ def generate_question_with_tiered_strategy(
     if should_try_fallback:
         if debug:
             print(f"↪️ 主通道未稳定产出，切换备用通道补发: {full_primary_lane} -> {full_secondary_lane}")
-        fallback_response, fallback_lane, fallback_meta = _call_question_with_optional_hedge(
+        fallback_response, fallback_lane, fallback_meta = _call_runtime_patchpoint(
+            "_server_call_question_with_optional_hedge",
+            _call_question_with_optional_hedge,
             prompt,
             max_tokens=full_secondary_max_tokens,
             call_type=f"{base_call_type}_fallback",

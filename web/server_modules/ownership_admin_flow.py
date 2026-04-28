@@ -174,7 +174,11 @@ class AdminOwnershipMigrationService:
             except Exception as exc:
                 if self._debug_enabled:
                     self._debug_log(f"⚠️ 读取对象存储 ownership migration 历史失败: {exc}")
-        items = list(items_by_backup_id.values())
+        items = [
+            item
+            for item in items_by_backup_id.values()
+            if not bool(item.get("rolled_back"))
+        ]
         items.sort(
             key=lambda item: (
                 str(item.get("generated_at") or ""),
