@@ -1,7 +1,19 @@
 {
-  "version": "2.2.2",
+  "version": "2.2.3",
   "releaseDate": "2026-04-28",
   "changelog": [
+    {
+      "version": "2.2.3",
+      "date": "2026-04-28",
+      "type": "patch",
+      "title": "修复全量回归中的运行时绑定污染",
+      "changes": [
+        "后端：隔离访谈与报告运行时模块绑定，避免多 server 实例导入时互相覆盖。",
+        "权限：恢复高风险管理员接口的 License 校验边界，保持 gate 关闭时的安全约束。",
+        "配置：归位 AI 预热、Paper2Slides 与 DATA_DIR 的配置模板职责。",
+        "测试：修复 ownership 迁移历史残留导致的回归计数漂移，并通过静态护栏与全量回归。"
+      ]
+    },
     {
       "version": "2.2.2",
       "date": "2026-04-28",
