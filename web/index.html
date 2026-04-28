@@ -2021,7 +2021,7 @@
                                     </template>
 
                                     <!-- 问题头部 - 未完成时显示 -->
-                                    <div x-show="getTotalProgress() < 100">
+                                    <div x-show="getTotalProgress() < 100 || currentQuestion.isFollowUp">
                                         <div class="flex items-center gap-3 mb-4">
                                             <span class="tag-pill" x-text="getDimensionName(currentDimension)"></span>
                                             <span class="text-muted text-sm">问题 <span x-text="getQuestionNumber()"></span></span>
@@ -2034,7 +2034,7 @@
                                     </div>
 
                                     <!-- 全部完成提示 - 100%时显示 -->
-                                    <div x-show="getTotalProgress() === 100" class="text-center py-8" style="display: none;">
+                                    <div x-show="getTotalProgress() === 100 && !currentQuestion.isFollowUp" class="text-center py-8" style="display: none;">
                                         <div class="inline-flex items-center justify-center w-16 h-16 bg-[#EFF6FF] rounded-full mb-4">
                                             <svg class="w-8 h-8 text-[#1D4ED8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -2046,7 +2046,7 @@
                                     </div>
 
                                     <!-- AI 推荐选项 -->
-                                    <template x-if="!isAssessmentSession() && currentQuestion.aiRecommendation && currentQuestion.aiRecommendation.recommendedOptions && currentQuestion.aiRecommendation.recommendedOptions.length > 0 && getTotalProgress() < 100">
+                                    <template x-if="!isAssessmentSession() && currentQuestion.aiRecommendation && currentQuestion.aiRecommendation.recommendedOptions && currentQuestion.aiRecommendation.recommendedOptions.length > 0 && (getTotalProgress() < 100 || currentQuestion.isFollowUp)">
                                         <div class="border border-gray-200 bg-white rounded-xl p-4 mb-4">
                                             <div class="flex items-center justify-between">
                                                 <div class="flex items-center gap-2">
@@ -2110,7 +2110,7 @@
                                     </template>
 
                                     <!-- 选项 - 未完成时显示 -->
-                                    <div class="space-y-3" x-show="getTotalProgress() < 100">
+                                    <div class="space-y-3" x-show="(getTotalProgress() < 100 || currentQuestion.isFollowUp) && currentQuestion.options && currentQuestion.options.length > 0">
                                         <template x-for="(option, index) in currentQuestion.options" :key="index">
                                             <div @click="toggleOption(option)"
                                                  :class="[isOptionSelected(option) ? 'border-[#EFF6FF] bg-cta/5 ring-2 ring-cta/20' : 'border-gray-200 hover:border-cta/50', isOptionRecommended(option) && !isOptionSelected(option) ? 'border-[#D6E6FF] bg-[#F7FAFF]' : '']"
@@ -2194,6 +2194,14 @@
                                         </div>
                                     </div>
 
+                                    <div x-show="(getTotalProgress() < 100 || currentQuestion.isFollowUp) && (!currentQuestion.options || currentQuestion.options.length === 0)"
+                                         class="space-y-2">
+                                        <textarea x-model="otherAnswerText"
+                                                  placeholder="请补充具体原因、场景或依据"
+                                                  rows="4"
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cta/50 focus:border-cta resize-y min-h-[120px]"></textarea>
+                                    </div>
+
                                     <!-- 用户控制按钮组 - 未完成时显示 -->
                                     <template x-if="(canShowSkipFollowUp() || canShowCompleteDimension()) && getTotalProgress() < 100">
                                         <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -2220,7 +2228,7 @@
                                     </template>
 
                                     <!-- 导航按钮 - 未完成时显示 -->
-                                    <div x-show="getTotalProgress() < 100" class="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-6 pt-4 border-t border-gray-100">
+                                    <div x-show="getTotalProgress() < 100 || currentQuestion.isFollowUp" class="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-6 pt-4 border-t border-gray-100">
                                         <button x-show="canGoPrevQuestion()"
                                                 @click="goPrevQuestion()"
                                                 class="report-action-tertiary px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer w-full sm:w-auto">
@@ -2230,7 +2238,7 @@
                                             上一题
                                         </button>
                                         <div x-show="!canGoPrevQuestion()" class="hidden sm:block"></div>
-                                        <button x-show="currentQuestion.options && currentQuestion.options.length > 0"
+                                        <button
                                                 @click="submitAnswer()"
                                                 :disabled="!canSubmitAnswer()"
                                                 :class="canSubmitAnswer() ? 'report-action-primary cursor-pointer' : 'report-action-disabled cursor-not-allowed'"
@@ -6349,8 +6357,8 @@
     <script src="site-config.js"></script>
     <script src="app_modules/session_list_state.js?v=20260409-auth-license-module-v1"></script>
     <script src="app_modules/report_state.js?v=20260409-auth-license-module-v1"></script>
-    <script src="app_modules/report_detail_runtime.js?v=20260409-report-detail-runtime-v1"></script>
-    <script src="app_modules/interview_runtime.js?v=20260410-interview-runtime-v1"></script>
+    <script src="app_modules/report_detail_runtime.js?v=20260428-report-readiness-v1"></script>
+    <script src="app_modules/interview_runtime.js?v=20260428-report-readiness-v1"></script>
     <script src="app_modules/auth_license_state.js?v=20260427-license-benefits-entry-v1"></script>
     <script src="app_modules/admin_center_state.js?v=20260410-admin-center-state-v1"></script>
     <script src="app.js?v=20260410-admin-center-state-v1"></script>
