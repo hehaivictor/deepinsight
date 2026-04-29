@@ -95,6 +95,7 @@ class ComprehensiveApiTests(unittest.TestCase):
         cls.server.TEMP_DIR = data_dir / "temp"
         cls.server.METRICS_DIR = data_dir / "metrics"
         cls.server.SUMMARIES_DIR = data_dir / "summaries"
+        cls.server.REFERENCE_MATERIALS_DIR = data_dir / "reference_materials"
         cls.server.PRESENTATIONS_DIR = data_dir / "presentations"
         cls.server.AUTH_DIR = data_dir / "auth"
         cls.server.AUTH_DB_PATH = cls.server.AUTH_DIR / "users.db"
@@ -114,6 +115,7 @@ class ComprehensiveApiTests(unittest.TestCase):
             cls.server.TEMP_DIR,
             cls.server.METRICS_DIR,
             cls.server.SUMMARIES_DIR,
+            cls.server.REFERENCE_MATERIALS_DIR,
             cls.server.PRESENTATIONS_DIR,
             cls.server.AUTH_DIR,
         ]:
@@ -1618,10 +1620,15 @@ class ComprehensiveApiTests(unittest.TestCase):
             self.assertIn("env", catalog_payload)
             self.assertIn("config", catalog_payload)
             self.assertIn("site", catalog_payload)
+            env_file_meta = catalog_payload.get("env", {}).get("file", {})
+            self.assertEqual(str(env_path), env_file_meta.get("write_target_path"))
+            self.assertEqual("single_highest_priority_env", env_file_meta.get("write_policy"))
+            self.assertIn("进程环境变量", env_file_meta.get("process_env_notice", ""))
             self.assertTrue(any(group.get("id") == "env_resolution" for group in catalog_payload["env"]["groups"]))
             self.assertTrue(any(group.get("id") == "config_models" for group in catalog_payload["config"]["groups"]))
             self.assertTrue(any(group.get("id") == "config_observability_cache" for group in catalog_payload["config"]["groups"]))
             self.assertTrue(any(group.get("id") == "site_home_copy" for group in catalog_payload["site"]["groups"]))
+            self.assertTrue(any(group.get("id") == "site_frontend_limits" for group in catalog_payload["site"]["groups"]))
 
             env_resolution_group = next(group for group in catalog_payload["env"]["groups"] if group.get("id") == "env_resolution")
             env_resolution_keys = {item.get("key") for item in env_resolution_group.get("items", [])}
@@ -1632,6 +1639,28 @@ class ComprehensiveApiTests(unittest.TestCase):
             env_deploy_keys = {item.get("key") for item in env_deploy_group.get("items", [])}
             self.assertIn("GUNICORN_ACCESSLOG", env_deploy_keys)
             self.assertIn("GUNICORN_ERRORLOG", env_deploy_keys)
+            self.assertIn("INSTANCE_SCOPE_ENFORCEMENT_ENABLED", env_deploy_keys)
+
+            config_models_group = next(group for group in catalog_payload["config"]["groups"] if group.get("id") == "config_models")
+            config_model_keys = {item.get("key") for item in config_models_group.get("items", [])}
+            self.assertIn("QUESTION_MODEL_NAME_DEEP", config_model_keys)
+
+            config_capacity_group = next(group for group in catalog_payload["config"]["groups"] if group.get("id") == "config_runtime_capacity")
+            config_capacity_keys = {item.get("key") for item in config_capacity_group.get("items", [])}
+            self.assertIn("SOLUTION_PAYLOAD_PREWARM_ENABLED", config_capacity_keys)
+            self.assertIn("SOLUTION_PAYLOAD_PREWARM_MAX_WORKERS", config_capacity_keys)
+            self.assertIn("VISION_MODEL_NAME", config_capacity_keys)
+            self.assertIn("SUPPORTED_IMAGE_TYPES", config_capacity_keys)
+
+            site_integration_group = next(group for group in catalog_payload["site"]["groups"] if group.get("id") == "site_frontend_integration")
+            site_integration_keys = {item.get("key") for item in site_integration_group.get("items", [])}
+            self.assertIn("api.sessionListPollInterval", site_integration_keys)
+            self.assertIn("api.reportStatusPollInterval", site_integration_keys)
+
+            site_limits_group = next(group for group in catalog_payload["site"]["groups"] if group.get("id") == "site_frontend_limits")
+            site_limit_keys = {item.get("key") for item in site_limits_group.get("items", [])}
+            self.assertIn("limits.topicMaxLength", site_limit_keys)
+            self.assertIn("limits.maxFileSize", site_limit_keys)
 
             config_observability_group = next(group for group in catalog_payload["config"]["groups"] if group.get("id") == "config_observability_cache")
             observability_items = {item.get("key"): item for item in config_observability_group.get("items", [])}
@@ -1724,6 +1753,75 @@ class ComprehensiveApiTests(unittest.TestCase):
             self.server.get_admin_config_file_path = old_get_config_file_path
             self.server.get_admin_site_config_file_path = old_get_site_config_file_path
             self.server.runtime_config = old_runtime_config
+
+    def test_admin_usage_endpoints_cover_cross_instance_business_activity(self):
+        admin_user = self._register()
+        user_client = self.server.app.test_client()
+        target_user = self._register(client=user_client)
+        old_admin_ids = set(self.server.ADMIN_USER_IDS)
+        old_admin_phones = set(self.server.ADMIN_PHONE_NUMBERS)
+        old_scope = self.server.INSTANCE_SCOPE_KEY
+        try:
+            self.server.ADMIN_USER_IDS = {int(admin_user["id"])}
+            self.server.ADMIN_PHONE_NUMBERS = set()
+            activation_code = self._generate_license_batch(note="用户统计管理员激活")["licenses"][0]["code"]
+            self._activate_license(activation_code)
+            target_license = self._generate_license_batch(level_key="professional", note="用户统计目标用户")["licenses"][0]["code"]
+            self._activate_license(target_license, client=user_client)
+
+            self.server.INSTANCE_SCOPE_KEY = "scope-a"
+            session = self._create_session(topic="用户统计会话", client=user_client)
+            session_id = session["session_id"]
+            dimension = next(iter(session.get("dimensions", {}) or {}))
+            self._submit_answer(session_id, dimension, question="统计问题", answer="统计回答", client=user_client)
+            upload_resp = user_client.post(
+                f"/api/sessions/{session_id}/documents",
+                data={"file": (io.BytesIO(b"# doc\nusage"), "usage.md")},
+                content_type="multipart/form-data",
+            )
+            self.assertEqual(upload_resp.status_code, 200, upload_resp.get_data(as_text=True))
+
+            report_name = "admin-usage-report.md"
+            (self.server.REPORTS_DIR / report_name).write_text("# 用户统计报告\n", encoding="utf-8")
+            self.server.set_report_owner_id(report_name, int(target_user["id"]))
+            self.server.set_report_scope_key(report_name, "scope-b")
+            self.server.sync_report_index_for_filename(report_name)
+
+            ordinary_client = self.server.app.test_client()
+            self._register(client=ordinary_client)
+            denied = ordinary_client.get("/api/admin/usage/users")
+            self.assertEqual(denied.status_code, 403, denied.get_data(as_text=True))
+
+            summary_resp = self.client.get("/api/admin/usage/summary?range=all")
+            self.assertEqual(summary_resp.status_code, 200, summary_resp.get_data(as_text=True))
+            summary = (summary_resp.get_json() or {}).get("summary") or {}
+            self.assertGreaterEqual(summary.get("matched_users", 0), 1)
+            self.assertGreaterEqual(summary.get("session_count", 0), 1)
+            self.assertGreaterEqual(summary.get("report_count", 0), 1)
+            self.assertGreaterEqual(summary.get("document_count", 0), 1)
+
+            users_resp = self.client.get(f"/api/admin/usage/users?range=all&q={target_user['phone']}")
+            self.assertEqual(users_resp.status_code, 200, users_resp.get_data(as_text=True))
+            users_payload = users_resp.get_json() or {}
+            items = users_payload.get("items") or []
+            self.assertEqual(1, len(items))
+            self.assertEqual(int(target_user["id"]), int(items[0]["user"]["id"]))
+            self.assertIn("scope-a", items[0]["usage"].get("instance_scope_keys") or [])
+            self.assertIn("scope-b", items[0]["usage"].get("instance_scope_keys") or [])
+            self.assertEqual("professional", items[0]["license"].get("level_key"))
+
+            detail_resp = self.client.get(f"/api/admin/usage/users/{target_user['id']}?range=all")
+            self.assertEqual(detail_resp.status_code, 200, detail_resp.get_data(as_text=True))
+            detail = (detail_resp.get_json() or {}).get("detail") or {}
+            self.assertTrue(detail.get("found"))
+            self.assertTrue(detail.get("sessions"))
+            self.assertTrue(detail.get("reports"))
+            self.assertTrue(detail.get("documents"))
+            self.assertNotIn("content", detail["documents"][0])
+        finally:
+            self.server.ADMIN_USER_IDS = old_admin_ids
+            self.server.ADMIN_PHONE_NUMBERS = old_admin_phones
+            self.server.INSTANCE_SCOPE_KEY = old_scope
 
     def test_wechat_auth_lifecycle_success(self):
         old_enabled = self.server.WECHAT_LOGIN_ENABLED
@@ -3111,6 +3209,47 @@ class ComprehensiveApiTests(unittest.TestCase):
         self.assertEqual(uploaded_document.get("stored_chars"), self.server.REFERENCE_MATERIAL_CONTENT_LIMIT)
         self.assertTrue(uploaded_document.get("is_truncated"))
         self.assertLessEqual(len(uploaded_document.get("content", "")), self.server.REFERENCE_MATERIAL_CONTENT_LIMIT)
+        self.assertTrue(uploaded_document.get("full_content_ref"))
+        self.assertTrue(uploaded_document.get("chunk_manifest_ref"))
+        self.assertGreater(uploaded_document.get("chunk_count", 0), 1)
+        manifest_path = self.server._resolve_data_ref(uploaded_document.get("chunk_manifest_ref"))
+        self.assertTrue(manifest_path.exists())
+
+    def test_long_document_tail_can_be_recalled_from_fulltext_chunks(self):
+        self._register()
+        session = self._create_session(topic="长文档尾部召回测试", description="关注最终验收口径")
+        session_id = session["session_id"]
+        dimension = next(iter(session.get("dimensions", {}) or {}))
+        filler = "\n".join(f"普通背景段落 {index}：这里没有关键验收词。" for index in range(220))
+        tail = "最终验收口径：必须支持跨实例统计、参考资料全文召回、配置中心写入目标说明。"
+        long_content = f"{filler}\n\n{tail}".encode("utf-8")
+
+        upload_resp = self.client.post(
+            f"/api/sessions/{session_id}/documents",
+            data={"file": (io.BytesIO(long_content), "tail.md")},
+            content_type="multipart/form-data",
+        )
+        self.assertEqual(upload_resp.status_code, 200, upload_resp.get_data(as_text=True))
+        uploaded_document = (upload_resp.get_json() or {}).get("uploaded_document") or {}
+        self.assertTrue(uploaded_document.get("chunk_manifest_ref"))
+
+        session_resp = self.client.get(f"/api/sessions/{session_id}")
+        self.assertEqual(session_resp.status_code, 200, session_resp.get_data(as_text=True))
+        loaded_session = session_resp.get_json() or {}
+        loaded_session["topic"] = "最终验收口径"
+        loaded_session.setdefault("dimensions", {}).setdefault(dimension, {"coverage": 0, "items": []})
+
+        prompt, _truncated_docs, meta = self.server.build_interview_prompt(
+            loaded_session,
+            dimension,
+            [],
+            session_id=session_id,
+        )
+
+        self.assertIn("最终验收口径", prompt)
+        self.assertIn("配置中心写入目标说明", prompt)
+        self.assertTrue(meta.get("reference_context_chunk_selected"))
+        self.assertEqual("chunk_selection", meta.get("reference_context_mode"))
 
     def test_document_upload_marks_conversion_failure_not_context_ready(self):
         self._register()
