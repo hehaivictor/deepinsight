@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "branch": "main",
+  "baseRef": "origin/main",
+  "sourceCommit": "ee41d8b",
+  "committedAt": "2026-04-30T11:03:37+08:00",
+  "versionType": "patch",
+  "title": "优化参考文档索引状态文案",
+  "changes": [
+    "前端区分全文索引可参考与兼容摘录压缩状态。",
+    "修复全文已索引文档被误提示为内容截断的问题。",
+    "验证 web/app.js 语法检查通过。"
+  ],
+  "changedFiles": [
+    "web/app.js"
+  ]
+}
